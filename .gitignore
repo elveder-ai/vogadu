@@ -1,6 +1,8 @@
 articles/
 reviews/
 
+firebase-emulators/
+
 # Logs
 logs
 *.log

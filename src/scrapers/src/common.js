@@ -62,7 +62,7 @@ function formatText(text) {
 }
 
 async function saveArticle(prefix, title, text) {
-  const articlesDirectoryPath = path.join(__dirname, '../articles');
+  const articlesDirectoryPath = path.join(__dirname, '../../../articles');
   await _addDirectoryIfNotExist(articlesDirectoryPath);
 
   const filePath = path.join(articlesDirectoryPath, `${prefix}_${title}.txt`);
@@ -78,7 +78,7 @@ async function saveArticle(prefix, title, text) {
 }
 
 async function saveReview(prefix, title, text) {
-  const reviewsDirectoryPath = path.join(__dirname, '../reviews');
+  const reviewsDirectoryPath = path.join(__dirname, '../../../reviews');
   await _addDirectoryIfNotExist(reviewsDirectoryPath);
 
   const filePath = path.join(reviewsDirectoryPath, `${prefix}_${title}.txt`);

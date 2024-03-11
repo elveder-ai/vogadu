@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Navigate to the Firebase Cloud Functions directory
-cd ./src/firebase/functions
+cd ../src/firebase/functions
 
 # Run the build command
 npm run build:watch &
@@ -10,4 +10,4 @@ npm run build:watch &
 cd ..
 
 # Start the Firebase emulators
-firebase emulators:start
+firebase emulators:start --import ../../firebase-emulators --export-on-exit ../../firebase-emulators

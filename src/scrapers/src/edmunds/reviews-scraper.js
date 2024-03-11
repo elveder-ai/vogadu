@@ -1,6 +1,16 @@
 const { getCars } = require('./cars.js');
 const { httpsGet } = require('./https.js');
-const { formatText, saveReview } = require('../common.js');
+const { formatText } = require('../common.js');
+const admin  = require('firebase-admin');
+const { getFirestore } = require('firebase-admin/firestore')
+
+const serviceAccount = require("../../../firebase/key.json");
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
+
+process.env['FIRESTORE_EMULATOR_HOST'] = '127.0.0.1:5002';
+const db = getFirestore();
 
 async function getReviews(carMaker, model, year) {
   try {
@@ -47,22 +57,17 @@ async function getReviews(carMaker, model, year) {
     for (const [index, review] of reviews.entries()) {
       const title = `${carData[0]}_${carData[1]}_${carData[2]}_review-${index}`;
 
-      let text = '';
-      text += `CAR MAKER: ${carData[0]}\n`;
-      text += `MODEL: ${carData[1]}\n`;
-      text += `YEAR: ${carData[2]}\n`;
-      text += '\n\n';
-      text += `TITLE: ${review.title}`;
-      text += '\n\n';
-      text += `TEXT: ${review.text}`;
-      text += '\n\n';
-      text += `UPVOTES: ${review.upvotes}`;
-      text += '\n';
-      text += `DOWNVOTES: ${review.downvotes}`;
+      const json = {
+        carMaker: carData[0],
+        model: carData[1],
+        year: carData[2],
+        title: formatText(review.title ?? ''),
+        text: formatText(review.text ?? ''),
+        upvotes: review.upvotes,
+        downvotes: review.downvotes
+      };
 
-      text = formatText(text);
-
-      await saveReview('edmunds', title, text);
+      await db.collection(`${carData[0]}_${carData[1]}_${carData[2]}`).doc().set(json);
     }
   }
 })();
