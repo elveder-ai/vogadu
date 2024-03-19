@@ -34,7 +34,7 @@ export const prompt = onRequest(async (request, response) => {
         }}
         ///
         
-        If cannot distinguish the CAR MAKER, the MODEL and the YEAR, or if the input is not related to cars, don't gues; instead just respond with "Unknown car" and don't generate the JSON.
+        If cannot distinguish the CAR MAKER, the MODEL and the YEAR, or if the input is not related to cars, don't gues; instead use "Unknown".
 
         User Input: I'm seriously considering buying a 2020 Tesla Model S for its cutting-edge technology features.
         {{
@@ -58,10 +58,32 @@ export const prompt = onRequest(async (request, response) => {
         }}
 
         User Input: I want to buy some BMW.
-        "Unknown car"
+        {{
+            "carMaker": "BMW",
+            "model: "Unknown",
+            "year": "Unknown"
+        }}
 
         User Input: I am thinking of getting some Mercedes-Benz S-class. But I am still researching for the year.
-        "Unknown car"
+        {{
+            "carMaker": "Mercedes-Benz",
+            "model: "S-Class",
+            "year": "Unknown"
+        }}
+
+        User Input: I really like Porche from 2018.
+        {{
+            "carMaker": "Porche",
+            "model: "Unknown",
+            "year": "2018"
+        }}
+
+        User Input: What would the weather be like in May?
+        {{
+            "carMaker": "Unknown",
+            "model: "Unknown",
+            "year": "Unknown"
+        }}
 
         User Input: {input}
     `);
