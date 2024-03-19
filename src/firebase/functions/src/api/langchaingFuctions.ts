@@ -20,10 +20,51 @@ export const prompt = onRequest(async (request, response) => {
         modelName: 'mistral-small-latest',
     });
 
-    const prompt = ChatPromptTemplate.fromMessages([
-        ['system', 'This is a sentense completion agent. Complete the sentence based on the input, provided by the user. The comleted sentence should be between 6 and 15 words. Generate only one sentence, do not generate additional text and do not include the words count.'],
-        ['human', '{input}'],
-    ]);
+    const prompt =ChatPromptTemplate.fromTemplate(`
+        What car is the user talking about?
+        Distinguish the CAR MAKER, the MODEL and the YEAR from the User Input.
+
+        Provide the response in the following format; do NOT include any addional details, disclaimers or notes:
+
+        /// json
+        {{
+            "carMaker": {{CAR_MAKER}},
+            "model": {{MODEL}},
+            "year": {{YEAR}}
+        }}
+        ///
+        
+        If cannot distinguish the CAR MAKER, the MODEL and the YEAR, or if the input is not related to cars, don't gues; instead just respond with "Unknown car" and don't generate the JSON.
+
+        User Input: I'm seriously considering buying a 2020 Tesla Model S for its cutting-edge technology features.
+        {{
+            "carMaker": "Tesla",
+            "model: "Model S",
+            "year": "2020"
+        }}
+
+        User Input: I've always dreamed of owning a piece of American history, so I'm on the lookout to buy a 1964 Ford Mustang.
+        {{
+            "carMaker": "Ford",
+            "model: "Mustang",
+            "year": "1964"
+        }}
+
+        User Input: After reading numerous reviews about its dependability and stylish design, I've decided I want to buy a 2018 Toyota Camry.
+        {{
+            "carMaker": "Toyota",
+            "model: "Camry",
+            "year": "2018"
+        }}
+
+        User Input: I want to buy some BMW.
+        "Unknown car"
+
+        User Input: I am thinking of getting some Mercedes-Benz S-class. But I am still researching for the year.
+        "Unknown car"
+
+        User Input: {input}
+    `);
 
     const outputParser = new StringOutputParser();
 
