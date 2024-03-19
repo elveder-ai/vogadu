@@ -54,7 +54,7 @@ async function getReviews(carMaker, model, year) {
 
     const reviews = await getReviews(carData[0], carData[1], carData[2]);
     
-    for (const [index, review] of reviews.entries()) {
+    for (const review of reviews.entries()) {
       const json = {
         carMaker: carData[0],
         model: carData[1],
