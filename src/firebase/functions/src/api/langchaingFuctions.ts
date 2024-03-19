@@ -21,22 +21,29 @@ export const prompt = onRequest(async (request, response) => {
     const data = parsePostData(request);
     logger.log(data);
 
-    const carData = await _getCarData(data.input);
+    const llmResponse = await _processUserInput(data.input);
+
+    if(llmResponse == undefined) {
+        response.send('It seems there is some issue on our end, and couldn\'t  process your request. Please try again.');
+        return;
+    }
+
+    if(!llmResponse.carMaker || !llmResponse.model || !llmResponse.year) {
+        response.send('We couldn\'t process your request because there might be an issue with the car maker, model, or year information provided. Please ensure you have mentioned all three and try again.');
+        return;
+    }
+
+    const carData = await _retrieveCarData(llmResponse);
 
     if(carData == undefined) {
         response.send('It seems there is some issue on our end, and couldn\'t  process your request. Please try again.');
         return;
     }
 
-    if(!carData.carMaker || !carData.model || !carData.year) {
-        response.send('We couldn\'t process your request because there might be an issue with the car maker, model, or year information provided. Please ensure you have mentioned all three and try again.');
-        return;
-    }
-
     response.send(carData);
 });
 
-async function _getCarData(input: string): Promise<CarDataModel | undefined>{
+async function _processUserInput(input: string): Promise<CarDataModel | undefined>{
     const chatModel = new ChatMistralAI({
         apiKey: MISTRAL_API_KEY,
         modelName: 'mistral-small-latest',
@@ -118,14 +125,42 @@ async function _getCarData(input: string): Promise<CarDataModel | undefined>{
         input: input
     });
 
-    console.log(result);
+    logger.log(result);
 
     try {
         const carData = JSON.parse(result);
 
         return carData;
     } catch (e: any) {
-        console.error(e);
+        logger.error(e);
+        
+        return undefined;
+    }
+}
+
+async function _retrieveCarData(llmResponse: CarDataModel): Promise<CarDataModel | undefined> {
+    const embeddings = new MistralAIEmbeddings({
+        apiKey: MISTRAL_API_KEY
+      });
+    
+      const dbConfig = {
+        url: QDRANT_URL,
+        apiKey: QDRANT_API_KEY,
+        collectionName: 'cars'
+      }
+    
+      const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, dbConfig);
+    
+      const result = await vectorStore.similaritySearch(`${llmResponse.carMaker} ${llmResponse.model} ${llmResponse.year}`, 1);
+    
+      logger.log(result);
+
+      try {
+        const carData = JSON.parse(result[0].pageContent);
+
+        return carData;
+    } catch (e: any) {
+        logger.error(e);
         
         return undefined;
     }
@@ -144,22 +179,3 @@ export const embeddings = onRequest(async (request, response) => {
     response.send(result);
 });
 
-export const retrieve = onRequest(async (request, response) => {
-    const data = parsePostData(request);
-
-    const embeddings = new MistralAIEmbeddings({
-        apiKey: MISTRAL_API_KEY
-      });
-    
-      const dbConfig = {
-        url: QDRANT_URL,
-        apiKey: QDRANT_API_KEY,
-        collectionName: 'cars'
-      }
-    
-      const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, dbConfig);
-    
-      const result = await vectorStore.similaritySearch(data.query, data.resultsNumber);
-    
-      response.send(result);
-});
