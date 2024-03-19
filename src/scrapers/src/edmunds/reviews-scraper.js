@@ -55,8 +55,6 @@ async function getReviews(carMaker, model, year) {
     const reviews = await getReviews(carData[0], carData[1], carData[2]);
     
     for (const [index, review] of reviews.entries()) {
-      const title = `${carData[0]}_${carData[1]}_${carData[2]}_review-${index}`;
-
       const json = {
         carMaker: carData[0],
         model: carData[1],
