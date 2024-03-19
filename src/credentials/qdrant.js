@@ -1,1 +1,0 @@
-export const qdrantApiKey = 'M2s39zNtibfQ9G4JP2pHKyvqsLwJlR8P7k19tw2TKcVTZg7xJ3lYzA';
