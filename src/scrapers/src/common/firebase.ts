@@ -1,9 +1,9 @@
 import * as admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
+import firebaseCredentials from "../../../credentials/firebase.json";
 
-const serviceAccount = require("../../../firebase/key.json");
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(firebaseCredentials as any),
 });
 
 //process.env['FIRESTORE_EMULATOR_HOST'] = '127.0.0.1:5002';

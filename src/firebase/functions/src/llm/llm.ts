@@ -5,23 +5,15 @@ import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { MistralAIEmbeddings, ChatMistralAI } from '@langchain/mistralai';
 import { QdrantVectorStore } from "@langchain/community/vectorstores/qdrant";
-
-const MISTRAL_API_KEY = '5XikMZrBKsmEv218407LqvLL3FapuuDg';
-
-const QDRANT_URL = 'https://fad86663-a2dc-4852-91da-a3cbfa76f130.us-east4-0.gcp.cloud.qdrant.io';
-const QDRANT_API_KEY = 'M2s39zNtibfQ9G4JP2pHKyvqsLwJlR8P7k19tw2TKcVTZg7xJ3lYzA';
-
-interface CarDataModel {
-    carMaker: string | null,
-    model: string | null,
-    year: string | null
-}
+import { CarDataModel } from './models/car-data-model';
+import mistralCredentials = require("../../../../credentials/mistral.json");
+import qdrantCredentials = require("../../../../credentials/qdrant.json");
 
 export const prompt = onRequest(async (request, response) => {
     const data = parsePostData(request);
     logger.log(data);
 
-    const llmResponse = await _processUserInput(data.input);
+    const llmResponse = await processUserInput(data.input);
 
     if(llmResponse == undefined) {
         response.send('It seems there is some issue on our end, and couldn\'t  process your request. Please try again.');
@@ -33,7 +25,7 @@ export const prompt = onRequest(async (request, response) => {
         return;
     }
 
-    const carData = await _retrieveCarData(llmResponse);
+    const carData = await retrieveCarData(llmResponse);
 
     if(carData == undefined) {
         response.send('It seems there is some issue on our end, and couldn\'t  process your request. Please try again.');
@@ -43,9 +35,9 @@ export const prompt = onRequest(async (request, response) => {
     response.send(carData);
 });
 
-async function _processUserInput(input: string): Promise<CarDataModel | undefined>{
+async function processUserInput(input: string): Promise<CarDataModel | undefined>{
     const chatModel = new ChatMistralAI({
-        apiKey: MISTRAL_API_KEY,
+        apiKey: mistralCredentials.apiKey,
         modelName: 'mistral-small-latest',
     });
 
@@ -138,14 +130,14 @@ async function _processUserInput(input: string): Promise<CarDataModel | undefine
     }
 }
 
-async function _retrieveCarData(llmResponse: CarDataModel): Promise<CarDataModel | undefined> {
+async function retrieveCarData(llmResponse: CarDataModel): Promise<CarDataModel | undefined> {
     const embeddings = new MistralAIEmbeddings({
-        apiKey: MISTRAL_API_KEY
+        apiKey: mistralCredentials.apiKey
       });
     
       const dbConfig = {
-        url: QDRANT_URL,
-        apiKey: QDRANT_API_KEY,
+        url: qdrantCredentials.url,
+        apiKey: qdrantCredentials.apiKey,
         collectionName: 'cars'
       }
     
@@ -171,7 +163,7 @@ export const embeddings = onRequest(async (request, response) => {
     logger.log(data);
 
     const embeddings = new MistralAIEmbeddings({
-        apiKey: MISTRAL_API_KEY
+        apiKey: mistralCredentials.apiKey
     });
 
     const result = await embeddings.embedQuery(data.input);
