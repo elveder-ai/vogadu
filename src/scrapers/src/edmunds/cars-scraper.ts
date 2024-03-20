@@ -1,28 +1,14 @@
-import { getCarMakers, getModels, getYears } from './cars'
-import { addToCollection } from './qdrant'
+import { getCars } from './cars'
+import { addToCollection } from '../common/qdrant'
 
 (async () => {
-  const carMakers = await getCarMakers();
+  const cars =  await getCars();
 
-  for (const carMaker of carMakers) {
-    const models = await getModels(carMaker);
+  for(const car of cars) {
+    const carAsString = JSON.stringify(car)
 
-    for (const model of models) {
-      const years = await getYears(carMaker, model);
+    console.log(carAsString);
 
-      for (const year of years) {
-        const car = {
-          carMaker: carMaker,
-          model: model,
-          year: year
-        }
-
-        const carAsString = JSON.stringify(car)
-
-        console.log(carAsString);
-
-        await addToCollection('cars', carAsString);
-      }
-    }
+    await addToCollection('cars', carAsString);
   }
 })();
