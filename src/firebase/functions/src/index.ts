@@ -1,4 +1,5 @@
-import * as langchainApi from './llm/llm'
+import * as llmApi from './llm/api'
+import * as discordChatApi from './chat/discord/api'
 
-// Langchain API
-export const prompt = langchainApi.prompt;
+export const llmPrompt = llmApi.prompt;
+export const discordChatInteractionsEndpoint = discordChatApi.interactionsEndpoint;

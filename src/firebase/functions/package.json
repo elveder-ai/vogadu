@@ -3,6 +3,7 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
+    "clean": "rm -rf -f ./lib",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
@@ -13,7 +14,7 @@
   "engines": {
     "node": "20"
   },
-  "main": "lib/index.js",
+  "main": "lib/firebase/functions/src/index.js",
   "dependencies": {
     "@langchain/mistralai": "^0.0.14",
     "@qdrant/js-client-rest": "^1.8.1",
