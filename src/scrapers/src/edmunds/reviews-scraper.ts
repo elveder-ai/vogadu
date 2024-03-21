@@ -1,9 +1,10 @@
 import { get } from '../common/artifacts';
 import { httpsGet } from './https';
 import { formatText } from '../common/formatters';
-import { addToCollection } from '../common/firebase';
+import { uploadFileToStorage } from '../common/firebase';
 import { ReviewModel } from './models/review-model';
 import { CarModel } from '../common/car-model';
+import { v4 as uuidv4 } from 'uuid';
 
 async function getReviews(carMaker: string, model: string, year: string): Promise<ReviewModel[]> {
   try {
@@ -39,7 +40,9 @@ async function getReviews(carMaker: string, model: string, year: string): Promis
 
     const reviews = await getReviews(car.carMaker, car.model, car.year);
     
-    for (const [index, review] of reviews.entries()) {
+    for (const review of reviews) {
+      const id: string = uuidv4();
+
       const json = {
         carMaker: car.carMaker,
         model: car.model,
@@ -50,7 +53,7 @@ async function getReviews(carMaker: string, model: string, year: string): Promis
         downvotes: review.downvotes
       };
 
-      await addToCollection(`${car.carMaker}_${car.model}_${car.year}`, json);
+      uploadFileToStorage(`${car.carMaker}/${car.model}/${car.year}/${id}.txt`, json);
     }
   }
 })();

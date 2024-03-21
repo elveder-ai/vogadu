@@ -9,7 +9,7 @@ export async function save<T>(rootDirectory: string, filename: string, data: T[]
 
   try {
     await fs.writeFile(filePath, dataJson);
-    console.log(`Saved to ${filePath}`);
+    console.log(`SAVED TO: ${filePath}`);
   } catch (e) {
     console.error('ERROR SAVING TO FILE', e);
   }
