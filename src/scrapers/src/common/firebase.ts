@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
-import { getStorage } from "firebase-admin/storage";
-import firebaseCredentials from "../../../credentials/firebase.json";
+import { getStorage } from 'firebase-admin/storage';
+import firebaseCredentials from '../../../credentials/firebase.json';
 
 admin.initializeApp({
   credential: admin.credential.cert(firebaseCredentials as any),
