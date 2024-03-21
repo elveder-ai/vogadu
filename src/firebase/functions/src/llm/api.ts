@@ -4,10 +4,10 @@ import * as logger from '../common/logger';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { MistralAIEmbeddings, ChatMistralAI } from '@langchain/mistralai';
-import { QdrantVectorStore } from "@langchain/community/vectorstores/qdrant";
+import { QdrantVectorStore } from '@langchain/community/vectorstores/qdrant';
 import { CarDataModel } from './models/car-data-model';
-import mistralCredentials = require("../../../../credentials/mistral.json");
-import qdrantCredentials = require("../../../../credentials/qdrant.json");
+import mistralCredentials = require('../../../../credentials/mistral.json');
+import qdrantCredentials = require('../../../../credentials/qdrant.json');
 
 export const prompt = onRequest(async (request, response) => {
     const data = parsePostData(request);

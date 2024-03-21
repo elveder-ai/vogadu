@@ -1,4 +1,4 @@
-import * as logger from "firebase-functions/logger";
+import * as logger from 'firebase-functions/logger';
 
 export function log(message: any) {
     logger.log(message, { structuredData: true });
