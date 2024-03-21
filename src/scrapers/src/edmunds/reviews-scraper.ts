@@ -1,8 +1,9 @@
-import { getCars } from './cars';
+import { get } from '../common/artifacts';
 import { httpsGet } from './https';
 import { formatText } from '../common/formatters';
 import { addToCollection } from '../common/firebase';
 import { ReviewModel } from './models/review-model';
+import { CarModel } from '../common/car-model';
 
 async function getReviews(carMaker: string, model: string, year: string): Promise<ReviewModel[]> {
   try {
@@ -31,25 +32,25 @@ async function getReviews(carMaker: string, model: string, year: string): Promis
 }
 
 (async () => {
-  const cars = await getCars();
+  const cars: CarModel[] = await get(__dirname, 'edmunds-cars');
   
-  for (const carData of cars) {
-    console.log(`Car maker: ${carData.carMaker}, model: ${carData.model}, year: ${carData.year}`);
+  for (const car of cars) {
+    console.log(`Car maker: ${car.carMaker}, model: ${car.model}, year: ${car.year}`);
 
-    const reviews = await getReviews(carData.carMaker, carData.model, carData.year);
+    const reviews = await getReviews(car.carMaker, car.model, car.year);
     
     for (const [index, review] of reviews.entries()) {
       const json = {
-        carMaker: carData.carMaker,
-        model: carData.model,
-        year: carData.year,
+        carMaker: car.carMaker,
+        model: car.model,
+        year: car.year,
         title: formatText(review.title ?? ''),
         text: formatText(review.text ?? ''),
         upvotes: review.upvotes,
         downvotes: review.downvotes
       };
 
-      await addToCollection(`${carData.carMaker}_${carData.model}_${carData.year}`, json);
+      await addToCollection(`${car.carMaker}_${car.model}_${car.year}`, json);
     }
   }
 })();

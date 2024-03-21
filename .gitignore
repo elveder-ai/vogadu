@@ -1,7 +1,6 @@
 .DS_Store
 
-articles/
-reviews/
+artifacts/
 
 firebase-emulators/
 
