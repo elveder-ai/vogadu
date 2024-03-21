@@ -42,7 +42,9 @@ export const prompt = onRequest(async (request, response) => {
 		return;
 	}
 
-	response.send(carData);
+	const reviews = await getReviews(carData);
+
+	response.send(reviews);
 });
 
 async function processUserInput(input: string): Promise<CarDataModel | undefined> {

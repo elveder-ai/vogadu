@@ -31,3 +31,9 @@ export async function uploadFileToStorage<T>(bucketFilePath: string, data: T) {
     console.error('ERROR UPLOADING FILE TO STORAGE', e);
   }
 }
+
+export async function deleteDirectoryFromStorage(directoryPath: string) {
+  await storage.bucket(firebaseCredentials.cloudStorageBucket).deleteFiles({
+    prefix: directoryPath
+  });
+}
