@@ -4,14 +4,15 @@ import { StringOutputParser } from '@langchain/core/output_parsers';
 import { MistralAIEmbeddings, ChatMistralAI } from '@langchain/mistralai';
 import { QdrantVectorStore } from '@langchain/community/vectorstores/qdrant';
 import { CarDataModel } from './models/car-data-model';
-import mistralCredentials = require('../../../../credentials/mistral.json');
-import qdrantCredentials = require('../../../../credentials/qdrant.json');
 import * as admin from 'firebase-admin';
 import { getStorage } from 'firebase-admin/storage';
-import firebaseCredentials = require('../../../../credentials/firebase.json');
 import { ReviewModel } from './models/review-model';
 import { createStuffDocumentsChain } from 'langchain/chains/combine_documents';
 import { Document } from '@langchain/core/documents';
+
+import mistralCredentials = require('../../../../credentials/mistral.json');
+import qdrantCredentials = require('../../../../credentials/qdrant.json');
+import firebaseCredentials = require('../../../../credentials/firebase.json');
 
 admin.initializeApp({
 	credential: admin.credential.cert(firebaseCredentials as any),

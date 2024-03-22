@@ -10,4 +10,5 @@ export const prompt = onRequest(async (request, response) => {
 	const result = await getCarDetails(data.input, 2000);
 
 	response.send(result);
+	return;
 });
