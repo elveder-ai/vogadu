@@ -87,7 +87,7 @@ export const processUserInput = onMessagePublished(DISCORD_PUB_SUB_TOPIC, async 
   logger.log('ProcessUserInput: DATA');
   logger.log(data);
 
-  const carDetails = await getCarDetails(data.input);
+  const carDetails = await getCarDetails(data.input, 2000);
 
   const rest = new REST({ version: '10' }).setToken(discordCredentials.token);
 

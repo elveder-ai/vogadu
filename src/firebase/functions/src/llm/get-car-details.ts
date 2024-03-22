@@ -19,7 +19,7 @@ admin.initializeApp({
 
 const storage = getStorage();
 
-export async function getCarDetails(input: string): Promise<string> {
+export async function getCarDetails(input: string, maxLength: number): Promise<string> {
 	const llmResponse = await processUserInput(input);
 
 	if (llmResponse == undefined) {
@@ -38,7 +38,7 @@ export async function getCarDetails(input: string): Promise<string> {
 
 	const reviews = await getReviews(carData);
 
-	const reviewsResult = await processReviews(reviews);
+	const reviewsResult = await processReviews(reviews, maxLength);
 
 	const result = `**${carData.carMaker} ${carData.model} ${carData.year}**\n\n${reviewsResult}`;
 
@@ -191,7 +191,7 @@ async function getReviews(carData: CarDataModel): Promise<ReviewModel[]> {
 	return reviews;
 }
 
-async function processReviews(reviews: ReviewModel[]): Promise<string> {
+async function processReviews(reviews: ReviewModel[], maxLength: number): Promise<string> {
 	const chatModel = new ChatMistralAI({
 		apiKey: mistralCredentials.apiKey,
 		modelName: 'mistral-small-latest',
@@ -201,7 +201,7 @@ async function processReviews(reviews: ReviewModel[]): Promise<string> {
 		This is a cars review summarisation agent.
 		Provide information about the car based only on the reviews, provided in the context.
 
-		Keep the output between 10 and 15 sentences and put a focus on the pottential issues, mentioned in the reviews. Also mark some of the possitive things about the car.
+		Keep the less than ${maxLength} characted long and put a focus on the pottential issues, mentioned in the reviews. Also mark some of the possitive things about the car.
 
         <context>
 		{context}
