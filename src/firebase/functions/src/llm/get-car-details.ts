@@ -10,6 +10,8 @@ import * as admin from 'firebase-admin';
 import { getStorage } from 'firebase-admin/storage';
 import firebaseCredentials = require('../../../../credentials/firebase.json');
 import { ReviewModel } from './models/review-model';
+import { createStuffDocumentsChain } from 'langchain/chains/combine_documents';
+import { Document } from '@langchain/core/documents';
 
 admin.initializeApp({
 	credential: admin.credential.cert(firebaseCredentials as any),
@@ -36,9 +38,9 @@ export async function getCarDetails(input: string): Promise<string> {
 
 	const reviews = await getReviews(carData);
 
-	logger.log(reviews);
+	const result = await processReviews(reviews);
 
-	return carData.carMaker?.toString() ?? 'Unknown';
+	return result;
 }
 
 async function processUserInput(input: string): Promise<CarDataModel | undefined> {
@@ -166,7 +168,8 @@ async function retrieveCarData(llmResponse: CarDataModel): Promise<CarDataModel 
 
 async function getReviews(carData: CarDataModel): Promise<ReviewModel[]> {
 	const files = await storage.bucket(firebaseCredentials.cloudStorageBucket).getFiles({
-		prefix: `${carData.carMaker}/${carData.model}/${carData.year}`
+		prefix: `${carData.carMaker}/${carData.model}/${carData.year}`,
+		maxResults: 50
 	});
 	const [filesAsArray] = files;
 
@@ -186,3 +189,39 @@ async function getReviews(carData: CarDataModel): Promise<ReviewModel[]> {
 	return reviews;
 }
 
+async function processReviews(reviews: ReviewModel[]): Promise<string> {
+	const chatModel = new ChatMistralAI({
+		apiKey: mistralCredentials.apiKey,
+		modelName: 'mistral-small-latest',
+	});
+
+	const prompt = ChatPromptTemplate.fromTemplate(`
+		This is a cars review summarisation agent.
+		Provide information about the car based only on the reviews, provided in the context.
+
+		Keep the output between 10 and 15 sentences and put a focus on the pottential issues, mentioned in the reviews. Also mark some of the possitive things about the car.
+
+        <context>
+		{context}
+		</context>
+	`);
+
+	const outputParser = new StringOutputParser();
+
+	const documentChain = await createStuffDocumentsChain({
+	llm: chatModel,
+	prompt,
+	});
+
+	const chain = documentChain.pipe(outputParser);
+
+	const context: Document[] = reviews.map(r => new Document({
+		pageContent: `${r.title}\n\n${r.text}`
+	}));
+
+	const result = await chain.invoke({
+		context: context
+	});
+
+	return result;
+}
