@@ -38,7 +38,9 @@ export async function getCarDetails(input: string): Promise<string> {
 
 	const reviews = await getReviews(carData);
 
-	const result = await processReviews(reviews);
+	const reviewsResult = await processReviews(reviews);
+
+	const result = `**${carData.carMaker} ${carData.model} ${carData.year}**\n\n${reviewsResult}`;
 
 	return result;
 }
