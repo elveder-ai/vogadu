@@ -2,7 +2,8 @@ import { InteractionType } from 'discord-interactions';
 
 export interface RequestModel {
     type: InteractionType,
-    data: DataModel
+    data: DataModel,
+    token: string
 }
 
 export interface DataModel {
