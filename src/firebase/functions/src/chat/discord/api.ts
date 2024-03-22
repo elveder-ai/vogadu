@@ -56,7 +56,7 @@ export const interactionsEndpoint = onRequest(async (request, response) => {
         response.send({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
-            content: 'Please wait, we are processing you request.'
+            content: '🔍 *Please wait, we are processing you request*'
           }
         });
       } catch(e: any) {
