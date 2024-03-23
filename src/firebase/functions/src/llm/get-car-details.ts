@@ -134,7 +134,6 @@ async function processUserInput(input: string): Promise<CarDataModel | undefined
 		return carData;
 	} catch (e: any) {
 		logger.error(['ProcessUserInput. ', e]);
-
 		return undefined;
 	}
 }
@@ -162,7 +161,6 @@ async function retrieveCarData(llmResponse: CarDataModel): Promise<CarDataModel 
 		return carData;
 	} catch (e: any) {
 		logger.error(['RetrieveCarData. ', e]);
-
 		return undefined;
 	}
 }
@@ -200,7 +198,21 @@ async function processReviews(reviews: ReviewModel[], maxLength: number): Promis
 		This is a cars review summarisation agent.
 		Provide information about the car based only on the reviews, provided in the context.
 
-		Keep the less than ${maxLength} characted long and put a focus on the pottential issues, mentioned in the reviews. Also mark some of the possitive things about the car.
+		The context is a collection of json documents with the following structure:
+		/// json
+        {{
+            "title" // string - The title of the user review
+            "text" // string - The review text
+            "upvotes" // number - The number of other users who upvoted the review
+			"downvotes" // number - The number of other uses who donwvoted the review
+        }}
+        ///
+
+		In the response incude information from the review.text property. Prioritise the reviews with higher review.upvotes. Put a focus on the pottential issues, mentioned in the reviews. Also mark some of the possitive things about the car.
+
+		If there isn't enough information provided in the context, don't gues; instead responde that the data is not sufficient.
+
+		Keep the response less than ${maxLength} characters long.
 
         <context>
 		{context}
@@ -210,14 +222,14 @@ async function processReviews(reviews: ReviewModel[], maxLength: number): Promis
 	const outputParser = new StringOutputParser();
 
 	const documentChain = await createStuffDocumentsChain({
-	llm: chatModel,
-	prompt,
+		llm: chatModel,
+		prompt,
 	});
 
 	const chain = documentChain.pipe(outputParser);
 
-	const context: Document[] = reviews.map(r => new Document({
-		pageContent: `${r.title}\n\n${r.text}`
+	const context: Document[] = reviews.map(review => new Document({
+		pageContent: JSON.stringify(review)
 	}));
 
 	const result = await chain.invoke({
