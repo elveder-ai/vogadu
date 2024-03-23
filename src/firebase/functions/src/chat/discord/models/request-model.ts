@@ -3,7 +3,8 @@ import { InteractionType } from 'discord-interactions';
 export interface RequestModel {
     type: InteractionType,
     data: DataModel,
-    token: string
+    token: string,
+    member: MemberModel
 }
 
 export interface DataModel {
@@ -17,4 +18,12 @@ export interface OptionsModel {
     name: string,
     type: number,
     value: string
+}
+
+export interface MemberModel {
+    user: UserModel;
+}
+
+export interface UserModel {
+    id: string;
 }

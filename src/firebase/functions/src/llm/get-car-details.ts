@@ -20,30 +20,28 @@ admin.initializeApp({
 
 const storage = getStorage();
 
-export async function getCarDetails(input: string, maxLength: number): Promise<string> {
+export async function getCarDetails(input: string, maxLength: number): Promise<[string, string | undefined]> {
 	const llmResponse = await processUserInput(input);
 
 	if (llmResponse == undefined) {
-		return 'It seems there is some issue on our end, and couldn\'t  process your request. Please try again.';
+		return ['It seems there is some issue on our end, and couldn\'t  process your request. Please try again.', undefined];
 	}
 
 	if (!llmResponse.carMaker || !llmResponse.model || !llmResponse.year) {
-		return 'We couldn\'t process your request because there might be an issue with the car maker, model, or year information provided. Please ensure you have mentioned all three and try again.';
+		return ['We couldn\'t process your request because there might be an issue with the car maker, model, or year information provided. Please ensure you have mentioned all three and try again.', undefined];
 	}
 
 	const carData = await retrieveCarData(llmResponse);
 
 	if (carData == undefined) {
-		return 'It seems there is some issue on our end, and couldn\'t  process your request. Please try again.';
+		return ['It seems there is some issue on our end, and couldn\'t  process your request. Please try again.', undefined];
 	}
 
 	const reviews = await getReviews(carData);
 
 	const reviewsResult = await processReviews(reviews, maxLength);
 
-	const result = `**${carData.carMaker} ${carData.model} ${carData.year}**\n\n${reviewsResult}`;
-
-	return result;
+	return [`${carData.carMaker} ${carData.model} ${carData.year}`, reviewsResult];
 }
 
 async function processUserInput(input: string): Promise<CarDataModel | undefined> {

@@ -60,7 +60,7 @@ export const interactionsEndpoint = onRequest(async (request, response) => {
       }
 
       try {
-        const pubSubMessage = new PubSubMessageModel(input!, data.token);
+        const pubSubMessage = new PubSubMessageModel(input!, data.token, data.member.user.id);
         const pubSubMessageJson = JSON.stringify(pubSubMessage);
         const buffer = Buffer.from(pubSubMessageJson);
 
@@ -106,10 +106,18 @@ export const processUserInput = onMessagePublished(DISCORD_PUB_SUB_TOPIC, async 
 
   const carDetails = await getCarDetails(data.input, 2000);
 
+  let result = '';
+  if(carDetails[1] == undefined) {
+    result = `${carDetails[0]} <@${data.userId}>`;
+  } else {
+    result = `**${carDetails[0]}** <@${data.userId}>\n\n${carDetails[1]}`;
+  }
+  
+
   const rest = new REST({ version: '10' }).setToken(discordCredentials.token);
 
   const reponse = {
-    content: carDetails
+    content: result
   }
   
   await rest.patch(Routes.webhookMessage(discordCredentials.applicationId, data.token), { body: reponse });
@@ -117,7 +125,7 @@ export const processUserInput = onMessagePublished(DISCORD_PUB_SUB_TOPIC, async 
   return;
 });
 
-export const ping = onSchedule('every 10 minutes', async (_) => {
+export const ping = onSchedule('every 15 minutes', async (_) => {
   logger.log('Ping');
 
   const headers = {
