@@ -18,6 +18,8 @@ const DISCORD_PUB_SUB_TOPIC = 'DISCORD';
 const PING_REQUEST_HEADER_KEY = 'X-Ping-Request';
 const PING_REQUEST_HEADER_VALUE = 'true';
 
+const DISCORD_MESSAGE_MAX_LENGTH = 2000;
+
 const pubSubClient = new PubSub();
 
 export const interactionsEndpoint = onRequest(async (request, response) => {
@@ -104,7 +106,7 @@ export const processUserInput = onMessagePublished(DISCORD_PUB_SUB_TOPIC, async 
   logger.log('ProcessUserInput: DATA');
   logger.log(data);
 
-  const carDetails = await getCarDetails(data.input, 2000);
+  const carDetails = await getCarDetails(data.input, DISCORD_MESSAGE_MAX_LENGTH);
 
   let result = '';
   if(carDetails[1] == undefined) {
@@ -112,7 +114,10 @@ export const processUserInput = onMessagePublished(DISCORD_PUB_SUB_TOPIC, async 
   } else {
     result = `**${carDetails[0]}** <@${data.userId}>\n\n${carDetails[1]}`;
   }
-  
+
+  if(result.length > DISCORD_MESSAGE_MAX_LENGTH) {
+    result = result.substring(0, DISCORD_MESSAGE_MAX_LENGTH);
+  }
 
   const rest = new REST({ version: '10' }).setToken(discordCredentials.token);
 
