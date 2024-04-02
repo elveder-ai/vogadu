@@ -52,7 +52,7 @@ import { ReviewModel } from "./models/review-model";
       } catch { }
     }
 
-    //await addManyToCollection('reviews', texts, metadatas);
+    await addManyToCollection('reviews', texts, metadatas);
   }
 })();
 
