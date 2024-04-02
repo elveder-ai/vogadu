@@ -6,7 +6,11 @@ import { addManyToCollection } from "../common/qdrant";
 import { ReviewModel } from "./models/review-model";
 
 (async () => {
-  const cars: CarModel[] = await get(__dirname, 'edmunds-cars');
+  let cars: CarModel[] = await get(__dirname, 'edmunds-cars');
+
+  // To start from specific car maker, model and year
+  const targetIndex = cars.findIndex(car => car.carMaker == 'chevrolet' && car.model == 'cobalt' && car.year == '2009');
+  cars = cars.slice(targetIndex);
 
   for (const car of cars) {
     let carJson = JSON.stringify(car);
@@ -48,7 +52,7 @@ import { ReviewModel } from "./models/review-model";
       } catch { }
     }
 
-    await addManyToCollection('reviews', texts, metadatas);
+    //await addManyToCollection('reviews', texts, metadatas);
   }
 })();
 
