@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import firebaseCredentials from '../../../credentials/firebase.json';
+import exp from 'constants';
 
 admin.initializeApp({
   credential: admin.credential.cert(firebaseCredentials as any),
@@ -30,6 +31,15 @@ export async function uploadFileToStorage<T>(bucketFilePath: string, data: T) {
   } catch(e) {
     console.error('ERROR UPLOADING FILE TO STORAGE', e);
   }
+}
+
+export async function getFilesInDirectory(directoryPath: string) {
+  const files = await storage.bucket(firebaseCredentials.cloudStorageBucket).getFiles({
+		prefix: directoryPath
+	});
+	const [filesAsArray] = files;
+
+  return filesAsArray;
 }
 
 export async function deleteDirectoryFromStorage(directoryPath: string) {
