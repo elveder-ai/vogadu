@@ -62,7 +62,15 @@ export const interactionsEndpoint = onRequest(async (request, response) => {
       }
 
       try {
-        const pubSubMessage = new PubSubMessageModel(input!, data.token, data.member.user.id);
+        let userId: string = '';
+
+        if(data.user) {
+          userId = data.user.id;
+        } else if(data.member) {
+          userId = data.member.user.id;
+        }
+
+        const pubSubMessage = new PubSubMessageModel(input!, data.token, userId);
         const pubSubMessageJson = JSON.stringify(pubSubMessage);
         const buffer = Buffer.from(pubSubMessageJson);
 

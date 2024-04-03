@@ -4,7 +4,8 @@ export interface RequestModel {
     type: InteractionType,
     data: DataModel,
     token: string,
-    member: MemberModel
+    member: MemberModel | undefined,
+    user: UserModel | undefined
 }
 
 export interface DataModel {
