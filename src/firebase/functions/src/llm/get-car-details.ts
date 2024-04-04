@@ -72,7 +72,7 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
 
   const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, dbConfig);
 
-  const carReviewsTool = await createRetrieverTool(vectorStore.asRetriever(90), {
+  const carReviewsTool = await createRetrieverTool(vectorStore.asRetriever(250), {
     name: "retrieve_car_reviews",
     description:
       "Retrieves reviews about specific car model. Use this tool for anything cars related.",
