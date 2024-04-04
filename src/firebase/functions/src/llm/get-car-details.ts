@@ -1,9 +1,8 @@
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
-import { ChatMistralAI } from '@langchain/mistralai';
-import { AgentExecutor, createOpenAIToolsAgent } from 'langchain/agents';
+import { ChatMistralAI, MistralAIEmbeddings } from '@langchain/mistralai';
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { AgentExecutor, createOpenAIToolsAgent } from 'langchain/agents';
 import { QdrantVectorStore } from "@langchain/community/vectorstores/qdrant";
-import { MistralAIEmbeddings } from '@langchain/mistralai';
 import { createRetrieverTool } from "langchain/tools/retriever";
 
 import mistralCredentials = require('../../../../credentials/mistral.json');
@@ -18,33 +17,33 @@ process.env.LANGCHAIN_TRACING_V2 = langsmithCredentials.tracingV2;
 
 export async function getCarDetails(input: string, maxLength: number): Promise<string> {
   // Mistal
-	const chatModel: any = new ChatMistralAI({
-		apiKey: mistralCredentials.apiKey,
-		modelName: 'mistral-large-latest',
-		temperature: 0
-	});
-
-	const embeddings = new MistralAIEmbeddings({
-		apiKey: mistralCredentials.apiKey
-	});
-
-  const qdrantColletionName = "reviews";
-
-  // OpenAI
-	// const chatModel: any = new ChatOpenAI({
-	// 	openAIApiKey: openAiCredentials.apiKey,
-	// 	modelName: 'gpt-3.5-turbo-0125',
-	// 	temperature: 0
-	// });
-
-  // const embeddings = new OpenAIEmbeddings({
-  //   openAIApiKey: openAiCredentials.apiKey,
-  //   modelName: 'text-embedding-3-small'
+  // const chatModel: any = new ChatMistralAI({
+  //   apiKey: mistralCredentials.apiKey,
+  //   modelName: 'mistral-large-latest',
+  //   temperature: 0
   // });
 
-  // const qdrantColletionName = "reviews";
+  // const embeddings = new MistralAIEmbeddings({
+  //   apiKey: mistralCredentials.apiKey
+  // });
 
-	const systemMessage = `
+  // const qdrantColletionName = `reviews-${mistralCredentials.qdrantSuffix}`;
+
+  // OpenAI
+  const chatModel: any = new ChatOpenAI({
+  	openAIApiKey: openAiCredentials.apiKey,
+  	modelName: 'gpt-3.5-turbo-0125',
+  	temperature: 0
+  });
+
+  const embeddings = new OpenAIEmbeddings({
+    openAIApiKey: openAiCredentials.apiKey,
+    modelName: 'text-embedding-3-small'
+  });
+
+  const qdrantColletionName = `reviews-${openAiCredentials.qdrantSuffix}`;
+
+  const systemMessage = `
     This is an agent that is a car specialist with years of experience.
 
     Answer only questions related to a specific car model and production year. For all the other question repond with an excuse that are out of the current functionalities.
@@ -58,42 +57,42 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
     The response shouldn't be more than ${maxLength} characters long.
   `;
 
-	const prompt = ChatPromptTemplate.fromMessages([
-		['system', systemMessage],
-		['human', '{input}'],
-		new MessagesPlaceholder("agent_scratchpad"),
-	]);
+  const prompt = ChatPromptTemplate.fromMessages([
+    ['system', systemMessage],
+    ['human', '{input}'],
+    new MessagesPlaceholder("agent_scratchpad"),
+  ]);
 
   const dbConfig = {
-			url: qdrantCredentials.url,
-			apiKey: qdrantCredentials.apiKey,
-			collectionName: qdrantColletionName
+    url: qdrantCredentials.url,
+    apiKey: qdrantCredentials.apiKey,
+    collectionName: qdrantColletionName
   }
 
-	const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, dbConfig);
+  const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, dbConfig);
 
-	const carReviewsTool = await createRetrieverTool(vectorStore.asRetriever(100), {
-		name: "retrieve_car_reviews",
-		description:
-			"Retrieves reviews about specific car model. Use this tool for anything cars related.",
-	});
+  const carReviewsTool = await createRetrieverTool(vectorStore.asRetriever(100), {
+    name: "retrieve_car_reviews",
+    description:
+      "Retrieves reviews about specific car model. Use this tool for anything cars related.",
+  });
 
-  const tools = [ carReviewsTool ];
+  const tools = [carReviewsTool];
 
-	const agent = await createOpenAIToolsAgent({
-		llm: chatModel,
-		tools: tools,
-		prompt: prompt,
-	});
+  const agent = await createOpenAIToolsAgent({
+    llm: chatModel,
+    tools: tools,
+    prompt: prompt,
+  });
 
-	const agentExecutor = new AgentExecutor({
-		agent: agent,
-		tools: tools,
-	});
+  const agentExecutor = new AgentExecutor({
+    agent: agent,
+    tools: tools,
+  });
 
-	const result = await agentExecutor.invoke({
-		input: input
-	});
+  const result = await agentExecutor.invoke({
+    input: input
+  });
 
-	return result.output;
+  return result.output;
 }
