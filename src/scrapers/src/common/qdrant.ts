@@ -10,19 +10,20 @@ export async function addToCollection(collection: string, text: string, metadata
   const texts = [ text ];
 
   // Mistral
-  const embeddings = new MistralAIEmbeddings({
-    apiKey: mistralCredentials.apiKey
-  });
-
-  const collectionName = `${collection}-mistal`;
-
-  // Open AI
-  // const embeddings = new OpenAIEmbeddings({
-  //   openAIApiKey: openAiCredentials.apiKey,
-  //   modelName: 'text-embedding-3-small'
+  // const embeddings = new MistralAIEmbeddings({
+  //   apiKey: mistralCredentials.apiKey
   // });
 
-  // const collectionName = `${collection}-openai`;
+  // const collectionName = `${collection}-mistal`;
+
+  // Open AI
+  const embeddings = new OpenAIEmbeddings({
+    openAIApiKey: openAiCredentials.apiKey,
+    modelName: 'text-embedding-3-large',
+    dimensions: 256
+  });
+
+  const collectionName = `${collection}-openai`;
 
   const dbConfig = {
     url: qdrantCredentials.url,
@@ -48,7 +49,8 @@ export async function addManyToCollection(collection: string, texts: string[], m
   // Open AI
   const embeddings = new OpenAIEmbeddings({
     openAIApiKey: openAiCredentials.apiKey,
-    modelName: 'text-embedding-3-small'
+    modelName: 'text-embedding-3-large',
+    dimensions: 256
   });
 
   const collectionName = `${collection}-${openAiCredentials.qdrantSuffix}`;

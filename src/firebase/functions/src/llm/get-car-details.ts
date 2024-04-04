@@ -38,7 +38,8 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
 
   const embeddings = new OpenAIEmbeddings({
     openAIApiKey: openAiCredentials.apiKey,
-    modelName: 'text-embedding-3-small'
+    modelName: 'text-embedding-3-large',
+    dimensions: 256
   });
 
   const qdrantColletionName = `reviews-${openAiCredentials.qdrantSuffix}`;
@@ -71,7 +72,7 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
 
   const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, dbConfig);
 
-  const carReviewsTool = await createRetrieverTool(vectorStore.asRetriever(100), {
+  const carReviewsTool = await createRetrieverTool(vectorStore.asRetriever(90), {
     name: "retrieve_car_reviews",
     description:
       "Retrieves reviews about specific car model. Use this tool for anything cars related.",
