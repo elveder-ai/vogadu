@@ -2,7 +2,7 @@ import * as llmApi from './llm/api'
 import * as discordChatApi from './chat/discord/api'
 
 // LLM
-export const llmPrompt = llmApi.prompt;
+export const agent = llmApi.agent;
 
 // Discord Chat
 export const discordChatInteractionsEndpoint = discordChatApi.interactionsEndpoint;

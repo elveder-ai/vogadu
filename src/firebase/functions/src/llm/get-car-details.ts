@@ -1,240 +1,99 @@
-import * as logger from '../common/logger';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { StringOutputParser } from '@langchain/core/output_parsers';
-import { MistralAIEmbeddings, ChatMistralAI } from '@langchain/mistralai';
-import { QdrantVectorStore } from '@langchain/community/vectorstores/qdrant';
-import { CarDataModel } from './models/car-data-model';
-import * as admin from 'firebase-admin';
-import { getStorage } from 'firebase-admin/storage';
-import { ReviewModel } from './models/review-model';
-import { createStuffDocumentsChain } from 'langchain/chains/combine_documents';
-import { Document } from '@langchain/core/documents';
+import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
+import { ChatMistralAI } from '@langchain/mistralai';
+import { AgentExecutor, createOpenAIToolsAgent } from 'langchain/agents';
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { QdrantVectorStore } from "@langchain/community/vectorstores/qdrant";
+import { MistralAIEmbeddings } from '@langchain/mistralai';
+import { createRetrieverTool } from "langchain/tools/retriever";
 
 import mistralCredentials = require('../../../../credentials/mistral.json');
+import openAiCredentials = require('../../../../credentials/openai.json');
 import qdrantCredentials = require('../../../../credentials/qdrant.json');
-import firebaseCredentials = require('../../../../credentials/firebase.json');
+import langsmithCredentials = require('../../../../credentials/langsmith.json');
 
-admin.initializeApp({
-	credential: admin.credential.cert(firebaseCredentials as any),
-});
+process.env.LANGCHAIN_ENDPOINT = langsmithCredentials.endpoint;
+process.env.LANGCHAIN_API_KEY = langsmithCredentials.apiKey;
+process.env.LANGCHAIN_PROJECT = langsmithCredentials.project
+process.env.LANGCHAIN_TRACING_V2 = langsmithCredentials.tracingV2;
 
-const storage = getStorage();
-
-export async function getCarDetails(input: string, maxLength: number): Promise<[string, string | undefined]> {
-	const llmResponse = await processUserInput(input);
-
-	if (llmResponse == undefined) {
-		return ['It seems there is some issue on our end, and couldn\'t  process your request. Please try again.', undefined];
-	}
-
-	if (!llmResponse.carMaker || !llmResponse.model || !llmResponse.year) {
-		return ['We couldn\'t process your request because there might be an issue with the car maker, model, or year information provided. Please ensure you have mentioned all three and try again.', undefined];
-	}
-
-	const carData = await retrieveCarData(llmResponse);
-
-	if (carData == undefined) {
-		return ['It seems there is some issue on our end, and couldn\'t  process your request. Please try again.', undefined];
-	}
-
-	const reviews = await getReviews(carData);
-
-	const reviewsResult = await processReviews(reviews, maxLength);
-
-	return [`${carData.carMaker} ${carData.model} ${carData.year}`, reviewsResult];
-}
-
-async function processUserInput(input: string): Promise<CarDataModel | undefined> {
-	const chatModel = new ChatMistralAI({
+export async function getCarDetails(input: string, maxLength: number): Promise<string> {
+  // Mistal
+	const chatModel: any = new ChatMistralAI({
 		apiKey: mistralCredentials.apiKey,
-		modelName: 'mistral-small-latest',
+		modelName: 'mistral-large-latest',
+		temperature: 0
 	});
 
-	const prompt = ChatPromptTemplate.fromTemplate(`
-        What car is the user talking about?
-        Distinguish the CAR MAKER, the MODEL and the YEAR from the User Input.
-
-        Provide the response in the following format; do NOT include any addional details, disclaimers or notes:
-
-        /// json
-        {{
-            "carMaker": {{CAR_MAKER}},
-            "model": {{MODEL}},
-            "year": {{YEAR}}
-        }}
-        ///
-        
-        If cannot distinguish the CAR MAKER, the MODEL and the YEAR, or if the input is not related to cars, don't gues; instead use null.
-
-        User Input: I'm seriously considering buying a 2020 Tesla Model S for its cutting-edge technology features.
-        {{
-            "carMaker": "Tesla",
-            "model": "Model S",
-            "year": "2020"
-        }}
-
-        User Input: I've always dreamed of owning a piece of American history, so I'm on the lookout to buy a 1964 Ford Mustang.
-        {{
-            "carMaker": "Ford",
-            "model": "Mustang",
-            "year": "1964"
-        }}
-
-        User Input: After reading numerous reviews about its dependability and stylish design, I've decided I want to buy a 2018 Toyota Camry.
-        {{
-            "carMaker": "Toyota",
-            "model": "Camry",
-            "year": "2018"
-        }}
-
-        User Input: I want to buy some BMW.
-        {{
-            "carMaker": "BMW",
-            "model": null,
-            "year": null
-        }}
-
-        User Input: I am thinking of getting some Mercedes-Benz S-class. But I am still researching for the year.
-        {{
-            "carMaker": "Mercedes-Benz",
-            "model": "S-Class",
-            "year": null
-        }}
-
-        User Input: I really like Porche from 2018.
-        {{
-            "carMaker": "Porche",
-            "model": null,
-            "year": "2018"
-        }}
-
-        User Input: What would the weather be like in May?
-        {{
-            "carMaker": null,
-            "model": null,
-            "year": null
-        }}
-
-        User Input: {input}
-	`);
-
-	const outputParser = new StringOutputParser();
-
-	const chain = prompt.pipe(chatModel).pipe(outputParser);
-
-	const result = await chain.invoke({
-		input: input
-	});
-
-	logger.log(result);
-
-	try {
-		const carData = JSON.parse(result);
-
-		return carData;
-	} catch (e: any) {
-		logger.error(['ProcessUserInput. ', e]);
-		return undefined;
-	}
-}
-
-async function retrieveCarData(llmResponse: CarDataModel): Promise<CarDataModel | undefined> {
 	const embeddings = new MistralAIEmbeddings({
 		apiKey: mistralCredentials.apiKey
 	});
 
-	const dbConfig = {
-		url: qdrantCredentials.url,
-		apiKey: qdrantCredentials.apiKey,
-		collectionName: 'cars'
-	}
+  const qdrantColletionName = "reviews";
+
+  // OpenAI
+	// const chatModel: any = new ChatOpenAI({
+	// 	openAIApiKey: openAiCredentials.apiKey,
+	// 	modelName: 'gpt-3.5-turbo-0125',
+	// 	temperature: 0
+	// });
+
+  // const embeddings = new OpenAIEmbeddings({
+  //   openAIApiKey: openAiCredentials.apiKey,
+  //   modelName: 'text-embedding-3-small'
+  // });
+
+  // const qdrantColletionName = "reviews";
+
+	const systemMessage = `
+    This is an agent that is a car specialist with years of experience.
+
+    Answer only questions related to a specific car model and production year. For all the other question repond with an excuse that are out of the current functionalities.
+
+    Extract details about the car from the reviews and respond to the user's question in a professional, yet friendly and undestandable manner.
+    The response should sound as the agent\'s oppinion, not as a reviews summarization.
+    Include a bullet lists where appropriate.
+    
+    Don't mention the word "reviews" in the response; use "information" or "data" instead.
+
+    The response shouldn't be more than ${maxLength} characters long.
+  `;
+
+	const prompt = ChatPromptTemplate.fromMessages([
+		['system', systemMessage],
+		['human', '{input}'],
+		new MessagesPlaceholder("agent_scratchpad"),
+	]);
+
+  const dbConfig = {
+			url: qdrantCredentials.url,
+			apiKey: qdrantCredentials.apiKey,
+			collectionName: qdrantColletionName
+  }
 
 	const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, dbConfig);
 
-	const result = await vectorStore.similaritySearch(`${llmResponse.carMaker} ${llmResponse.model} ${llmResponse.year}`, 1);
-
-	logger.log(result);
-
-	try {
-		const carData = JSON.parse(result[0].pageContent);
-
-		return carData;
-	} catch (e: any) {
-		logger.error(['RetrieveCarData. ', e]);
-		return undefined;
-	}
-}
-
-async function getReviews(carData: CarDataModel): Promise<ReviewModel[]> {
-	const files = await storage.bucket(firebaseCredentials.cloudStorageBucket).getFiles({
-		prefix: `${carData.carMaker}/${carData.model}/${carData.year}`,
-		maxResults: 50
-	});
-	const [filesAsArray] = files;
-
-	const reviews: ReviewModel[] = []
-
-	for (const file of filesAsArray) {
-		const content = await file.download();
-
-		try {
-			const contentJson = content.toString();
-			const review: ReviewModel = JSON.parse(contentJson);
-
-			reviews.push(review);
-		} catch { }
-	}
-
-	return reviews;
-}
-
-async function processReviews(reviews: ReviewModel[], maxLength: number): Promise<string> {
-	const chatModel = new ChatMistralAI({
-		apiKey: mistralCredentials.apiKey,
-		modelName: 'mistral-small-latest',
+	const carReviewsTool = await createRetrieverTool(vectorStore.asRetriever(100), {
+		name: "retrieve_car_reviews",
+		description:
+			"Retrieves reviews about specific car model. Use this tool for anything cars related.",
 	});
 
-	const prompt = ChatPromptTemplate.fromTemplate(`
-		This is a cars review summarisation agent.
-		Provide information about the car based only on the reviews, provided in the context.
+  const tools = [ carReviewsTool ];
 
-		The context is a collection of json documents with the following structure:
-		/// json
-        {{
-            "title" // string - The title of the user review
-            "text" // string - The review text
-            "upvotes" // number - The number of other users who upvoted the review
-			"downvotes" // number - The number of other uses who donwvoted the review
-        }}
-        ///
-
-		In the response incude information from the review.text property. Prioritise the reviews with higher review.upvotes. Put a focus on the pottential issues, mentioned in the reviews. Also mark some of the possitive things about the car.
-
-		If there isn't enough information provided in the context, don't gues; instead responde that the data is not sufficient.
-
-		Keep the response less than ${maxLength} characters long.
-
-        <context>
-		{context}
-		</context>
-	`);
-
-	const outputParser = new StringOutputParser();
-
-	const documentChain = await createStuffDocumentsChain({
+	const agent = await createOpenAIToolsAgent({
 		llm: chatModel,
-		prompt,
+		tools: tools,
+		prompt: prompt,
 	});
 
-	const chain = documentChain.pipe(outputParser);
-
-	const context: Document[] = reviews.map(review => new Document({
-		pageContent: JSON.stringify(review)
-	}));
-
-	const result = await chain.invoke({
-		context: context
+	const agentExecutor = new AgentExecutor({
+		agent: agent,
+		tools: tools,
 	});
 
-	return result;
+	const result = await agentExecutor.invoke({
+		input: input
+	});
+
+	return result.output;
 }

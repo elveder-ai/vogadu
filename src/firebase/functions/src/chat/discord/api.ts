@@ -116,12 +116,7 @@ export const processUserInput = onMessagePublished(DISCORD_PUB_SUB_TOPIC, async 
 
   const carDetails = await getCarDetails(data.input, DISCORD_MESSAGE_MAX_LENGTH);
 
-  let result = '';
-  if(carDetails[1] == undefined) {
-    result = `${carDetails[0]} <@${data.userId}>`;
-  } else {
-    result = `**${carDetails[0]}** <@${data.userId}>\n\n${carDetails[1]}`;
-  }
+  let result = `<@${data.userId}>\n${carDetails[0]} `;
 
   if(result.length > DISCORD_MESSAGE_MAX_LENGTH) {
     result = result.substring(0, DISCORD_MESSAGE_MAX_LENGTH);
