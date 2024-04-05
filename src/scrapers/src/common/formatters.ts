@@ -1,3 +1,7 @@
+export function formatCarData(data: string) {
+  return data.toLowerCase().replaceAll(' ', '-').replaceAll('_', '-').replaceAll('/', '').replaceAll(',', '');
+}
+
 export function formatText(text: string) {
   let result = text;
 

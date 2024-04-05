@@ -61,7 +61,7 @@ export async function addManyToCollection(collection: string, texts: string[], m
     collectionName: collectionName,
   }
 
-  const chunkSize = 10;
+  const chunkSize = 50;
 
   for(let i=0; i<texts.length; i+=chunkSize) {
     const textsChunk = texts.slice(i, i + chunkSize);

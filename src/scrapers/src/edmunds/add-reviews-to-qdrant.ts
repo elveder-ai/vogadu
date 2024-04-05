@@ -1,34 +1,28 @@
 import { get } from "../common/artifacts";
 import { CarModel } from "../common/car-model";
-import { getFilesInDirectory } from "../common/firebase";
+import { getFile } from "../common/firebase";
 import { splitTextIntoParagraphs } from "../common/formatters";
 import { addManyToCollection } from "../common/qdrant";
-import { ReviewModel } from "./models/review-model";
+import { ReviewModel } from "../common/review-model";
 
 (async () => {
   const cars: CarModel[] = await get(__dirname, 'edmunds-cars');
 
   for (const car of cars) {
-    let carJson = JSON.stringify(car);
+    console.log(car);
 
-    console.log(carJson);
-
-    const reviewFiles = await getFilesInDirectory(`${car.carMaker}/${car.model}/${car.year}`);
-
-    console.log(`Reviews: ${reviewFiles.length}`);
+    const reviewsFile = getFile(`edmunds/${car.carMaker}_${car.model}_${car.year}.txt`);
+    const content = await reviewsFile.download();
 
     const texts: string[] = [];
     const metadatas: object[] = [];
 
-    for (const file of reviewFiles) {
-      const id = getReviewId(file.name);
-      const content = await file.download();
-
-      try {
-        const contentJson = content.toString();
-        const review: ReviewModel = JSON.parse(contentJson);
-        
-        const reviewParagraphs = splitTextIntoParagraphs(review.text ?? '');
+    try {
+      const contentJson = content.toString();
+      const reviews: ReviewModel[] = JSON.parse(contentJson);
+      
+      for(const review of reviews) {
+        const reviewParagraphs = splitTextIntoParagraphs(review.text);
 
         for(const [index, paragraph] of reviewParagraphs.entries()) {
           const text = `[${car.carMaker} ${car.model} ${car.year}] ${paragraph}`;
@@ -37,7 +31,7 @@ import { ReviewModel } from "./models/review-model";
             carMaker: car.carMaker,
             model: car.model,
             year: car.year,
-            reviewId: id,
+            reviewId: review.id,
             paragraphNumber: index + 1,
             totalParagraphsCount: reviewParagraphs.length
           }
@@ -45,18 +39,9 @@ import { ReviewModel } from "./models/review-model";
           texts.push(text);
           metadatas.push(json);
         }
-      } catch { }
-    }
+      }
+    } catch { }
 
     await addManyToCollection('reviews', texts, metadatas);
   }
 })();
-
-function getReviewId(reviewFileName: string) {
-  const dotIndex = reviewFileName.indexOf('.');
-  reviewFileName = reviewFileName.substring(0, dotIndex);
-
-  const parts = reviewFileName.split('/');
-
-  return parts[3];
-}

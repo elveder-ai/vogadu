@@ -1,5 +1,6 @@
 import { save } from '../common/artifacts';
 import { CarModel } from '../common/car-model';
+import { formatCarData } from '../common/formatters';
 import { httpsGet } from './https';
 import { GetCarMakersApiResponseModel } from './models/get-car-makers-api-response-model';
 import { GetModelsApiReponseModel } from './models/get-models-api-reponse-mode';
@@ -11,7 +12,7 @@ async function getCarMakers(): Promise<string[]> {
 
     const httpsResult = await httpsGet(url);
     const json = JSON.parse(httpsResult);
-    const result = Object.values<GetCarMakersApiResponseModel>(json.results).map(r => r.name.toLowerCase().replaceAll(' ', '-').replaceAll('_', '-').replaceAll(',', ''));
+    const result = Object.values<GetCarMakersApiResponseModel>(json.results).map(r => formatCarData(r.name));
 
     return result.sort();
   } catch (e) {
@@ -28,7 +29,7 @@ async function getModels(carMaker: string): Promise<string[]> {
 
     const httpsResult = await httpsGet(url);
     const json = JSON.parse(httpsResult);
-    const result = Object.values<GetModelsApiReponseModel>(json.results).map(r => r.name.toLowerCase().replaceAll(' ', '-').replaceAll('_', '-').replaceAll('/', '').replaceAll(',', ''));
+    const result = Object.values<GetModelsApiReponseModel>(json.results).map(r => formatCarData(r.name));
 
     return result.sort();
   } catch (e) {
@@ -50,7 +51,7 @@ async function getYears(carMaker: string, model: string): Promise<string[]> {
 
     for (const data of Object.values<GetYearsApiReponseModel>(json.results)) {
       for (const year of Object.keys(data.years || {})) {
-        years.add(year.replaceAll(',', ''));
+        years.add(formatCarData(year));
       }
     }
 

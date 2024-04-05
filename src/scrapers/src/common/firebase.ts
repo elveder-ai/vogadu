@@ -2,7 +2,6 @@ import * as admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import firebaseCredentials from '../../../credentials/firebase.json';
-import exp from 'constants';
 
 admin.initializeApp({
   credential: admin.credential.cert(firebaseCredentials as any),
@@ -33,6 +32,12 @@ export async function uploadFileToStorage<T>(bucketFilePath: string, data: T) {
   }
 }
 
+export function getFile(filePath: string) {
+  const file = storage.bucket(firebaseCredentials.cloudStorageBucket).file(filePath);
+
+  return file;
+}
+
 export async function getFilesInDirectory(directoryPath: string) {
   const files = await storage.bucket(firebaseCredentials.cloudStorageBucket).getFiles({
 		prefix: directoryPath
@@ -42,8 +47,16 @@ export async function getFilesInDirectory(directoryPath: string) {
   return filesAsArray;
 }
 
-export async function deleteDirectoryFromStorage(directoryPath: string) {
-  await storage.bucket(firebaseCredentials.cloudStorageBucket).deleteFiles({
-    prefix: directoryPath
-  });
+export async function deleteFile(filePath: string) {
+  await storage.bucket(firebaseCredentials.cloudStorageBucket).file(filePath).delete();
+}
+
+export async function deleteDirectoryFromStorage(directoryPath: string | undefined) {
+  if(directoryPath == undefined) {
+    await storage.bucket(firebaseCredentials.cloudStorageBucket).deleteFiles();
+  } else {
+    await storage.bucket(firebaseCredentials.cloudStorageBucket).deleteFiles({
+      prefix: directoryPath
+    });
+  }
 }

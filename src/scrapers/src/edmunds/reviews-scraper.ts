@@ -2,11 +2,11 @@ import { get } from '../common/artifacts';
 import { httpsGet } from './https';
 import { formatText } from '../common/formatters';
 import { uploadFileToStorage } from '../common/firebase';
-import { ReviewModel } from './models/review-model';
+import { ReviewModel } from '../common/review-model';
 import { CarModel } from '../common/car-model';
 import { v4 as uuidv4 } from 'uuid';
 
-async function getReviews(carMaker: string, model: string, year: string): Promise<ReviewModel[]> {
+async function getReviews(carMaker: string, model: string, year: string): Promise<string[]> {
   try {
     const parametersString = `{"vehicleFilter":{"makeSlug":"${carMaker}","modelSlug":"${model}","years":[${year}]},"pageRequest":{"pageNum":1,"pageSize":999999999},"sortBy":{"confidence":"DESC"},"reviewFilter":{"userRating":null}}`;
     const parameters = encodeURIComponent(parametersString);
@@ -16,12 +16,7 @@ async function getReviews(carMaker: string, model: string, year: string): Promis
     const httpsResult = await httpsGet(url);
     const json = JSON.parse(httpsResult);
   
-    const result: ReviewModel[] = json.data.vehicleReviews.reviews.map((review: any) => ({
-      title: review.title,
-      text: review.text,
-      upvotes: review.thumbsUp,
-      downvotes: review.thumbsDown
-    }));
+    const result: string[] = json.data.vehicleReviews.reviews.map((review: any) => review.text ?? '');
   
     return result;
   } catch (e) {
@@ -36,24 +31,15 @@ async function getReviews(carMaker: string, model: string, year: string): Promis
   const cars: CarModel[] = await get(__dirname, 'edmunds-cars');
   
   for (const car of cars) {
-    console.log(`Car maker: ${car.carMaker}, model: ${car.model}, year: ${car.year}`);
+    console.log(car);
 
     const reviews = await getReviews(car.carMaker, car.model, car.year);
+
+    const data: ReviewModel[] = reviews.map(review => new ReviewModel(
+      uuidv4(),
+      formatText(review)
+    ))
     
-    for (const review of reviews) {
-      const id: string = uuidv4();
-
-      const json = {
-        carMaker: car.carMaker,
-        model: car.model,
-        year: car.year,
-        title: formatText(review.title ?? ''),
-        text: formatText(review.text ?? ''),
-        upvotes: review.upvotes,
-        downvotes: review.downvotes
-      };
-
-      uploadFileToStorage(`${car.carMaker}/${car.model}/${car.year}/${id}.txt`, json);
-    }
+    await uploadFileToStorage(`edmunds/${car.carMaker}_${car.model}_${car.year}.txt`, data);
   }
 })();
