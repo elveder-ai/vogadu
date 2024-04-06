@@ -47,15 +47,15 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
   const systemMessage = `
     This is an agent that is a car specialist with years of experience.
 
-    Answer only questions related to a specific car model and production year. For all the other question repond with an excuse that are out of the current functionalities.
+    Answer only to questions related to cars.
 
-    Extract details about the car from the reviews and respond to the user's question in a professional, yet friendly and undestandable manner.
-    The response should sound as the agent\'s oppinion, not as a reviews summarization.
+    Respond to the user's question in a professional, yet friendly and undestandable manner.
+    The response should sound like the agent\'s oppinion, not as a reviews summarization. Write the answers as they are one's experience and knowedge.
     Include a bullet lists where appropriate.
     
     Don't mention the word "reviews" in the response; use "information" or "data" instead.
 
-    The response shouldn't be more than ${maxLength} characters long.
+    The response should be relatively short - between 5 to 10 sentences and not more than ${maxLength} characters long.
   `;
 
   const prompt = ChatPromptTemplate.fromMessages([
@@ -72,7 +72,7 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
 
   const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, dbConfig);
 
-  const carReviewsTool = await createRetrieverTool(vectorStore.asRetriever(250), {
+  const carReviewsTool = await createRetrieverTool(vectorStore.asRetriever(50), {
     name: "retrieve_car_reviews",
     description:
       "Retrieves reviews about specific car model. Use this tool for anything cars related.",

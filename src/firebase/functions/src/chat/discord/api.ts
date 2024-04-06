@@ -116,7 +116,7 @@ export const processUserInput = onMessagePublished(DISCORD_PUB_SUB_TOPIC, async 
 
   const carDetails = await getCarDetails(data.input, DISCORD_MESSAGE_MAX_LENGTH);
 
-  let result = `<@${data.userId}>\n${carDetails[0]} `;
+  let result = `<@${data.userId}>\n**${data.input}**\n\n${carDetails} `;
 
   if(result.length > DISCORD_MESSAGE_MAX_LENGTH) {
     result = result.substring(0, DISCORD_MESSAGE_MAX_LENGTH);
