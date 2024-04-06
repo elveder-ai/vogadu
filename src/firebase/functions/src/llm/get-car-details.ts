@@ -1,9 +1,9 @@
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { ChatMistralAI, MistralAIEmbeddings } from '@langchain/mistralai';
-import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
 import { AgentExecutor, createOpenAIToolsAgent } from 'langchain/agents';
-import { QdrantVectorStore } from "@langchain/community/vectorstores/qdrant";
-import { createRetrieverTool } from "langchain/tools/retriever";
+import { QdrantVectorStore } from '@langchain/community/vectorstores/qdrant';
+import { createRetrieverTool } from 'langchain/tools/retriever';
 
 import mistralCredentials = require('../../../../credentials/mistral.json');
 import openAiCredentials = require('../../../../credentials/openai.json');
@@ -53,7 +53,7 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
     The response should sound like the agent\'s oppinion, not as a reviews summarization. Write the answers as they are one's experience and knowedge.
     Include a bullet lists where appropriate.
     
-    Don't mention the word "reviews" in the response; use "information" or "data" instead.
+    Don't mention the word 'reviews' in the response; use 'information' or 'data' instead.
 
     The response should be relatively short - between 5 to 10 sentences and not more than ${maxLength} characters long.
   `;
@@ -61,7 +61,7 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
   const prompt = ChatPromptTemplate.fromMessages([
     ['system', systemMessage],
     ['human', '{input}'],
-    new MessagesPlaceholder("agent_scratchpad"),
+    new MessagesPlaceholder('agent_scratchpad'),
   ]);
 
   const dbConfig = {
@@ -73,9 +73,9 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
   const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, dbConfig);
 
   const carReviewsTool = await createRetrieverTool(vectorStore.asRetriever(50), {
-    name: "retrieve_car_reviews",
+    name: 'retrieve_car_reviews',
     description:
-      "Retrieves reviews about specific car model. Use this tool for anything cars related.",
+      'Retrieves reviews about specific car model. Use this tool for anything cars related.',
   });
 
   const tools = [carReviewsTool];
