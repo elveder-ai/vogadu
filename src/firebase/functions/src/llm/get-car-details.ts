@@ -50,12 +50,13 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
     Answer only to questions related to cars.
 
     Respond to the user's question in a professional, yet friendly and undestandable manner.
-    The response should sound like the agent\'s oppinion, not as a reviews summarization. Write the answers as they are one's experience and knowedge.
+    The response shouldn't sound like information summarization; make is like the one's oppinion, experience and knowedge.
+    Don't start with 'Based on <some information>'; directly answer the queion instead.
     Include a bullet lists where appropriate.
     
     Don't mention the word 'reviews' in the response; use 'information' or 'data' instead.
 
-    The response should be relatively short - between 5 to 10 sentences and not more than ${maxLength} characters long.
+    The response should be about 5-6 sentences and not more than ${maxLength} characters.
   `;
 
   const prompt = ChatPromptTemplate.fromMessages([
