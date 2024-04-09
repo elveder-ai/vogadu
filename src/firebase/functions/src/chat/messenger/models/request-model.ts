@@ -27,6 +27,7 @@ interface MessageModel {
 }
 
 interface PostbackModel {
+    title: string;
+    payload: string;
     mid: string;
-    text: string;
 }
