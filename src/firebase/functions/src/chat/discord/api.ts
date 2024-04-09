@@ -7,16 +7,12 @@ import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { PubSubMessageModel } from './models/pub-sub-message-model';
 import { REST, Routes } from 'discord.js';
 import { getCarDetails } from '../../llm/get-car-details';
-import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { sendPingRequest } from '../../common/ping';
 import { getSubData, sendPubRequest } from '../../common/pub-sub';
+import { PING_REQUEST_HEADER_KEY, PING_REQUEST_HEADER_VALUE } from '../../common/ping';
 
 import discordCredentials = require('../../../../../credentials/discord.json');
 
 const DISCORD_PUB_SUB_TOPIC = 'DISCORD';
-
-const PING_REQUEST_HEADER_KEY = 'X-Ping-Request';
-const PING_REQUEST_HEADER_VALUE = 'true';
 
 const DISCORD_MESSAGE_MAX_LENGTH = 2000;
 
@@ -123,12 +119,6 @@ export const processUserInput = onMessagePublished(DISCORD_PUB_SUB_TOPIC, async 
   await rest.patch(Routes.webhookMessage(discordCredentials.applicationId, data.token), { body: reponse });
 
   return;
-});
-
-export const ping = onSchedule('every 15 minutes', async (_) => {
-  logger.log('Ping');
-
-  await sendPingRequest('discordchat-interactionsendpoint-b2fgjymb5a-uc.a.run.app', PING_REQUEST_HEADER_KEY, PING_REQUEST_HEADER_VALUE);
 });
 
 function authorize(request: Request): boolean {

@@ -4,8 +4,7 @@ import { parseGetParameters, parsePostData } from '../../common/request';
 import crypto from 'crypto';
 import { RequestModel } from './models/request-model';
 import { sendMarkSeen, sendMessage, sendTypingOn } from './graph-api';
-import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { sendPingRequest } from '../../common/ping';
+import { PING_REQUEST_HEADER_KEY, PING_REQUEST_HEADER_VALUE } from '../../common/ping';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { getSubData, sendPubRequest } from '../../common/pub-sub';
 import { PubSubMessageModel } from './models/pub-sub-message-model';
@@ -14,9 +13,6 @@ import { getCarDetails } from '../../llm/get-car-details';
 import messengerCredentials = require('../../../../../credentials/messenger.json');
 
 const MESSENGER_PUB_SUB_TOPIC = 'MESSENGER';
-
-const PING_REQUEST_HEADER_KEY = 'X-Ping-Request';
-const PING_REQUEST_HEADER_VALUE = 'true';
 
 export const callback = onRequest(async (request, response) => {
   // Ping
@@ -90,12 +86,6 @@ export const processUserInput = onMessagePublished(MESSENGER_PUB_SUB_TOPIC, asyn
   await sendMessage(data.senderId, carDetails);
 
   return;
-});
-
-export const ping = onSchedule('every 15 minutes', async (_) => {
-  logger.log('Ping');
-
-  await sendPingRequest('https://messengerchat-callback-b2fgjymb5a-uc.a.run.app', PING_REQUEST_HEADER_KEY, PING_REQUEST_HEADER_VALUE);
 });
 
 function verifyRequestSignature(request: Request): boolean {

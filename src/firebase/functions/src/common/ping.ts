@@ -1,9 +1,12 @@
 import { sendHttpsRequest } from "./https";
 import * as logger from './logger';
 
-export async function sendPingRequest(url: string, pingRequestHeaderKey: string, pingRequestHeaderValue: string) {
+export const PING_REQUEST_HEADER_KEY = 'X-Ping-Request';
+export const PING_REQUEST_HEADER_VALUE = 'true';
+
+export async function sendPingRequest(url: string) {
   const headers = {
-    [pingRequestHeaderKey]: pingRequestHeaderValue
+    [PING_REQUEST_HEADER_KEY]: PING_REQUEST_HEADER_VALUE
   };
   
   const options = {
