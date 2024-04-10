@@ -64,8 +64,12 @@ export const callback = onRequest(async (request, response) => {
   if(data.entry[0].messaging[0].message != undefined) {
     const input = data.entry[0].messaging[0].message.text;
   
-    const pubSubMessage = new PubSubMessageModel(senderId, input);
-    await sendPubRequest(MESSENGER_PUB_SUB_TOPIC, pubSubMessage);
+    if(input.indexOf('delete') != -1) {
+      await sendMessage(senderId, 'We have deleted all the data we have collected from you.');
+    } else {
+      const pubSubMessage = new PubSubMessageModel(senderId, input);
+      await sendPubRequest(MESSENGER_PUB_SUB_TOPIC, pubSubMessage);
+    }
   } else if(data.entry[0].messaging[0].postback != undefined) {
     await sendMessage(senderId, 'Hi there! This is Vogadu, an AI powered bot for answering all your car related questions.');
     await sendMessage(senderId, 'Just a heads up, while we strive to provide accurate and up-to-date information, there can be mistakes. Please consider consulting a professional for critical issues or decisions.');

@@ -125,6 +125,43 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Set Commands",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"commands\": [\n        {\n            \"locale\": \"default\",\n            \"commands\": [\n                {\n                    \"name\": \"delete\",\n                    \"description\": \"Delete the data we have collected from you\"\n                }\n            ]\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://graph.facebook.com/v19.0/me/messenger_profile?access_token=EAAE44iESPg4BO5hp6nhGDmU1T9JCyeTgDS2OfgTjgWykiKUIHQxCuA9Hgi0UyZCPJODpgvCDiiH7005tghGZB9gh9GKPHF7FdaD5cBQ60BO2QhfUCyLvP6l8Pu5xjdE7tTTTsuCPqmX7eYOH7O1V2eraIjy0pR5rNm7Xh0r23nf4JMQnVzXZAHAZBC6IWoVMxOtZAPTp1yXQdSTxgvLSAsBaNrQZDZD",
+							"protocol": "https",
+							"host": [
+								"graph",
+								"facebook",
+								"com"
+							],
+							"path": [
+								"v19.0",
+								"me",
+								"messenger_profile"
+							],
+							"query": [
+								{
+									"key": "access_token",
+									"value": "EAAE44iESPg4BO5hp6nhGDmU1T9JCyeTgDS2OfgTjgWykiKUIHQxCuA9Hgi0UyZCPJODpgvCDiiH7005tghGZB9gh9GKPHF7FdaD5cBQ60BO2QhfUCyLvP6l8Pu5xjdE7tTTTsuCPqmX7eYOH7O1V2eraIjy0pR5rNm7Xh0r23nf4JMQnVzXZAHAZBC6IWoVMxOtZAPTp1yXQdSTxgvLSAsBaNrQZDZD"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
