@@ -9,6 +9,8 @@ import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { getSubData, sendPubRequest } from '../../common/pub-sub';
 import { PubSubMessageModel } from './models/pub-sub-message-model';
 import { getCarDetails } from '../../llm/get-car-details';
+import { addUser, getUser, deleteUser } from '../../storage/users';
+import { UserModel } from '../../storage/models/user-model';
 
 import messengerCredentials = require('../../../../../credentials/messenger.json');
 
@@ -61,23 +63,41 @@ export const callback = onRequest(async (request, response) => {
   await sendMarkSeen(senderId);
   await sendTypingOn(senderId);
 
+  const user = await getUser(senderId);
+
+  if(user == undefined) {
+    await addUser(new UserModel(
+      senderId
+    ));
+  }
+
   if(data.entry[0].messaging[0].message != undefined) {
-    const input = data.entry[0].messaging[0].message.text;
-  
-    if(input.indexOf('delete') != -1) {
+    if(data.entry[0].messaging[0].message.commands != undefined) {
+      await deleteUser(senderId);
       await sendMessage(senderId, 'We have deleted all the data we have collected from you.');
     } else {
+      const input = data.entry[0].messaging[0].message.text;
+
+      if(user == undefined) {
+        await sendInitialMessages(senderId);
+        await sendTypingOn(senderId);
+      }
+
       const pubSubMessage = new PubSubMessageModel(senderId, input);
       await sendPubRequest(MESSENGER_PUB_SUB_TOPIC, pubSubMessage);
     }
   } else if(data.entry[0].messaging[0].postback != undefined) {
-    await sendMessage(senderId, 'Hi there! This is Vogadu, an AI powered bot for answering all your car related questions.');
-    await sendMessage(senderId, 'Just a heads up, while we strive to provide accurate and up-to-date information, there can be mistakes. Please consider consulting a professional for critical issues or decisions.');
+    await sendInitialMessages(senderId);
     await sendMessage(senderId, 'Now, what\'s on your mind?');
   }
 
   response.send(true);
 });
+
+async function sendInitialMessages(senderId: string) {
+  await sendMessage(senderId, 'Hi there! This is Vogadu, an AI powered bot for answering all your car related questions.');
+  await sendMessage(senderId, 'Just a heads up, while we strive to provide accurate and up-to-date information, there can be mistakes. Please consider consulting a professional for critical issues or decisions.');
+}
 
 export const processUserInput = onMessagePublished(MESSENGER_PUB_SUB_TOPIC, async (event) => {
   let data: PubSubMessageModel;

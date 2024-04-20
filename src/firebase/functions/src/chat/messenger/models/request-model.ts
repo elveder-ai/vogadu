@@ -24,6 +24,11 @@ interface ParticipantModel {
 interface MessageModel {
     mid: string;
     text: string;
+    commands: CommandModel[] | undefined;
+}
+
+interface CommandModel {
+    name: string;
 }
 
 interface PostbackModel {
