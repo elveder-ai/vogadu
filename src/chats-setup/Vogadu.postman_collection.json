@@ -59,7 +59,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"greeting\": [\n        {\n            \"locale\": \"default\",\n            \"text\": \"Hello, {{user_first_name}}! This is Vogadu, an AI powered car specialist that can answer all you questions about cars. Ready to get started?\"\n        }\n    ]\n}",
+							"raw": "{\n    \"greeting\": [\n        {\n            \"locale\": \"default\",\n            \"text\": \"Hello, {{user_first_name}}! This is Vogadu, an AI powered bot that can answer all you questions about cars. Ready to get started?\"\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
