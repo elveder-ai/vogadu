@@ -46,7 +46,7 @@ export const callback = onRequest(async (request, response) => {
   } catch { }
 
   if(!verifyRequestSignature(request)) {
-    //throw new Error('Request Signature verification error!');
+    throw new Error('Request Signature verification error!');
   }
 
   // Event Notifications
