@@ -90,11 +90,13 @@ export async function sendConvertionsApiEvent(senderId: string, value: number) {
     }
   };
 
+  const timestamp = Math.floor(Date.now() / 1000);
+
   const data = {
     'data': [
       {
         'event_name': 'Purchase',
-        'event_time': Date.now(),
+        'event_time': timestamp,
         'action_source': 'business_messaging',
         'messaging_channel': 'messenger',
         'user_data': {
@@ -103,7 +105,7 @@ export async function sendConvertionsApiEvent(senderId: string, value: number) {
         },
         'custom_data': {
           'currency': 'USD',
-          'value': number
+          'value': value
         }
       }
     ]

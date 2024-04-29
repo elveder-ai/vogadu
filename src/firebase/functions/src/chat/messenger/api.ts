@@ -90,6 +90,7 @@ export const callback = onRequest(async (request, response) => {
     }
   } else if(data.entry[0].messaging[0].postback != undefined) {
     await sendConvertionsApiEvent(senderId, 0);
+    
     await sendInitialMessages(senderId);
     await sendMessage(senderId, 'Now, what\'s on your mind?');
   }
