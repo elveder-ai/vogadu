@@ -8,9 +8,11 @@ import { PING_REQUEST_HEADER_KEY, PING_REQUEST_HEADER_VALUE } from '../../common
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { getSubData, sendPubRequest } from '../../common/pub-sub';
 import { PubSubMessageModel } from './models/pub-sub-message-model';
-import { getCarDetails } from '../../llm/get-car-details';
+import { processMessage } from '../../llm/agent';
 import { addUser, getUser, deleteUser } from '../../storage/users';
 import { UserModel } from '../../storage/models/user-model';
+import { addMessage, deleteMessagesByUser } from '../../storage/messages';
+import { MessageModel } from '../../storage/models/message-model';
 
 import messengerCredentials = require('../../../../../credentials/messenger.json');
 
@@ -73,7 +75,9 @@ export const callback = onRequest(async (request, response) => {
 
   if(data.entry[0].messaging[0].message != undefined) {
     if(data.entry[0].messaging[0].message.commands != undefined) {
+      await deleteMessagesByUser(senderId);
       await deleteUser(senderId);
+
       await sendMessage(senderId, 'We have deleted all the data we have collected from you.');
     } else {
       await sendConvertionsApiEvent(senderId, 1);
@@ -85,7 +89,7 @@ export const callback = onRequest(async (request, response) => {
         await sendTypingOn(senderId);
       }
 
-      const pubSubMessage = new PubSubMessageModel(senderId, input);
+      const pubSubMessage = new PubSubMessageModel(senderId, getSessionId(), input);
       await sendPubRequest(MESSENGER_PUB_SUB_TOPIC, pubSubMessage);
     }
   } else if(data.entry[0].messaging[0].postback != undefined) {
@@ -117,9 +121,17 @@ export const processUserInput = onMessagePublished(MESSENGER_PUB_SUB_TOPIC, asyn
   logger.log('ProcessUserInput: DATA');
   logger.log(data);
 
-  const carDetails = await getCarDetails(data.input, 2000);
+  const response = await processMessage(data.senderId, data.sessionId, data.input, 2000);
 
-  await sendMessage(data.senderId, carDetails);
+  await sendMessage(data.senderId, response);
+
+  await addMessage(new MessageModel(
+    data.senderId,
+    data.sessionId,
+    new Date(),
+    data.input,
+    response
+  ));
 
   return;
 });
@@ -140,4 +152,13 @@ function verifyRequestSignature(request: Request): boolean {
     .digest('hex');
 
   return signatureHash == expectedHash;
+}
+
+function getSessionId(): string {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 }

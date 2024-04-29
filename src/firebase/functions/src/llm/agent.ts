@@ -4,6 +4,8 @@ import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
 import { AgentExecutor, createOpenAIToolsAgent } from 'langchain/agents';
 import { QdrantVectorStore } from '@langchain/community/vectorstores/qdrant';
 import { createRetrieverTool } from 'langchain/tools/retriever';
+import { getMessagesByUser } from '../storage/messages';
+import { AIMessage, BaseMessage, HumanMessage } from "@langchain/core/messages";
 
 import mistralCredentials = require('../../../../credentials/mistral.json');
 import openAiCredentials = require('../../../../credentials/openai.json');
@@ -15,7 +17,17 @@ process.env.LANGCHAIN_API_KEY = langsmithCredentials.apiKey;
 process.env.LANGCHAIN_PROJECT = langsmithCredentials.project
 process.env.LANGCHAIN_TRACING_V2 = langsmithCredentials.tracingV2;
 
-export async function getCarDetails(input: string, maxLength: number): Promise<string> {
+const CHAT_HISTORY_KEY = "chat_history";
+
+export async function processMessage(userId: string, sessionId: string, input: string, maxLength: number): Promise<string> {
+  const messages = await getMessagesByUser(userId, sessionId);
+  const chatHistory: BaseMessage[] = [];
+
+  for(const message of messages) {
+    chatHistory.push(new HumanMessage(message.request));
+    chatHistory.push(new AIMessage(message.response));
+  }
+
   // Mistal
   // const chatModel: any = new ChatMistralAI({
   //   apiKey: mistralCredentials.apiKey,
@@ -76,6 +88,7 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
 
   const prompt = ChatPromptTemplate.fromMessages([
     ['system', systemMessage],
+    new MessagesPlaceholder(CHAT_HISTORY_KEY),
     ['human', '{input}'],
     new MessagesPlaceholder('agent_scratchpad'),
   ]);
@@ -108,7 +121,8 @@ export async function getCarDetails(input: string, maxLength: number): Promise<s
   });
 
   const result = await agentExecutor.invoke({
-    input: input
+    input: input,
+    chat_history: chatHistory
   });
 
   return result.output;

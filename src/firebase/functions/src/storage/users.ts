@@ -1,8 +1,5 @@
-import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { UserModel } from './models/user-model';
-
-initializeApp();
 
 const db = getFirestore();
 

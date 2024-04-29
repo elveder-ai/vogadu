@@ -1,6 +1,10 @@
+import { initializeApp } from 'firebase-admin/app';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as logger from './common/logger';
 import { sendPingRequest } from './common/ping';
+
+// Initialiaze Firebase
+initializeApp();
 
 // Ping request
 export const ping = onSchedule('every 15 minutes', async (_) => {
