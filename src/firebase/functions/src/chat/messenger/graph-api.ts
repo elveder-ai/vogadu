@@ -2,9 +2,14 @@ import * as logger from '../../common/logger';
 import { sendHttpsRequest } from '../../common/https';
 
 import messengerCredentials = require('../../../../../credentials/messenger.json');
-import { number } from 'zod';
+
+export const MESSAGE_MAX_LENGHT = 2000;
 
 export async function sendMessage(senderId: string, message: string) {
+  if(message.length > MESSAGE_MAX_LENGHT) {
+    message = message.substring(0, MESSAGE_MAX_LENGHT);
+  }
+
   const options = {
     hostname: 'graph.facebook.com',
     path: `/v2.6/me/messages?access_token=${messengerCredentials.pageAccessToken}`,

@@ -3,7 +3,7 @@ import * as logger from '../../common/logger';
 import { parseGetParameters, parsePostData } from '../../common/request';
 import crypto from 'crypto';
 import { RequestModel } from './models/request-model';
-import { sendMarkSeen, sendMessage, sendTypingOn, sendConvertionsApiEvent } from './graph-api';
+import { sendMarkSeen, sendMessage, sendTypingOn, sendConvertionsApiEvent, MESSAGE_MAX_LENGHT } from './graph-api';
 import { PING_REQUEST_HEADER_KEY, PING_REQUEST_HEADER_VALUE } from '../../common/ping';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { getSubData, sendPubRequest } from '../../common/pub-sub';
@@ -121,7 +121,7 @@ export const processUserInput = onMessagePublished(MESSENGER_PUB_SUB_TOPIC, asyn
   logger.log('ProcessUserInput: DATA');
   logger.log(data);
 
-  const response = await processMessage(data.senderId, data.sessionId, data.input, 2000);
+  const response = await processMessage(data.senderId, data.sessionId, data.input, MESSAGE_MAX_LENGHT);
 
   await sendMessage(data.senderId, response);
 
