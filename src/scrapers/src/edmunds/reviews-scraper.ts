@@ -6,7 +6,7 @@ import { ReviewModel } from '../common/review-model';
 import { CarModel } from '../common/car-model';
 import { v4 as uuidv4 } from 'uuid';
 
-async function getReviews(carMaker: string, model: string, year: string): Promise<string[]> {
+async function getReviews(carMaker: string, model: string, year: number): Promise<string[]> {
   try {
     const parametersString = `{"vehicleFilter":{"makeSlug":"${carMaker}","modelSlug":"${model}","years":[${year}]},"pageRequest":{"pageNum":1,"pageSize":999999999},"sortBy":{"confidence":"DESC"},"reviewFilter":{"userRating":null}}`;
     const parameters = encodeURIComponent(parametersString);

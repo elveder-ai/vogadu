@@ -83,9 +83,7 @@ export async function sendMarkSeen(senderId: string) {
   }
 }
 
-
-
-export async function sendConvertionsApiEvent(senderId: string, value: number) {
+export async function sendContactConvertionsApiEvent(senderId: string) {
   const options = {
     hostname: 'graph.facebook.com',
     path: `/v19.0/${messengerCredentials.datasetId}/events?access_token=${messengerCredentials.convertionsApiAccessToken}`,
@@ -100,17 +98,12 @@ export async function sendConvertionsApiEvent(senderId: string, value: number) {
   const data = {
     'data': [
       {
-        'event_name': 'Purchase',
+        'event_name': 'Contact',
         'event_time': timestamp,
-        'action_source': 'business_messaging',
-        'messaging_channel': 'messenger',
+        'action_source': 'website',
         'user_data': {
           'page_id': messengerCredentials.pageId,
           'page_scoped_user_id': senderId,
-        },
-        'custom_data': {
-          'currency': 'USD',
-          'value': value
         }
       }
     ]

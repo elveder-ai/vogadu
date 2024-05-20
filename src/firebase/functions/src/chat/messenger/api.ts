@@ -3,7 +3,7 @@ import * as logger from '../../common/logger';
 import { parseGetParameters, parsePostData } from '../../common/request';
 import crypto from 'crypto';
 import { RequestModel } from './models/request-model';
-import { sendMarkSeen, sendMessage, sendTypingOn, sendConvertionsApiEvent, MESSAGE_MAX_LENGHT } from './graph-api';
+import { sendMarkSeen, sendMessage, sendTypingOn, MESSAGE_MAX_LENGHT } from './graph-api';
 import { PING_REQUEST_HEADER_KEY, PING_REQUEST_HEADER_VALUE } from '../../common/ping';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { getSubData, sendPubRequest } from '../../common/pub-sub';
@@ -80,8 +80,6 @@ export const callback = onRequest(async (request, response) => {
 
       await sendMessage(senderId, 'We have deleted all the data we have collected from you.');
     } else {
-      await sendConvertionsApiEvent(senderId, 1);
-
       const input = data.entry[0].messaging[0].message.text;
 
       if(user == undefined) {
@@ -93,8 +91,6 @@ export const callback = onRequest(async (request, response) => {
       await sendPubRequest(MESSENGER_PUB_SUB_TOPIC, pubSubMessage);
     }
   } else if(data.entry[0].messaging[0].postback != undefined) {
-    await sendConvertionsApiEvent(senderId, 0);
-    
     await sendInitialMessages(senderId);
     await sendMessage(senderId, 'Now, what\'s on your mind?');
   }

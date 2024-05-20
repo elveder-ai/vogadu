@@ -5,14 +5,26 @@ import { splitTextIntoParagraphs } from "../common/formatters";
 import { addManyToCollection } from "../common/qdrant";
 import { ReviewModel } from "../common/review-model";
 
+const REVIEWS_SOURCE = 'edmunds';
+
+function formatCarDetails(car: CarModel): string {
+    return `${car.carMaker.replaceAll('-', ' ').toUpperCase()} ${car.model.replaceAll('-', ' ').toUpperCase()} ${car.year}`;
+}
+
 (async () => {
-  const cars: CarModel[] = await get(__dirname, 'edmunds-cars');
+  const cars: CarModel[] = await get(__dirname, `${REVIEWS_SOURCE}-cars`);
 
   for (const car of cars) {
     console.log(car);
 
-    const reviewsFile = getFile(`edmunds/${car.carMaker}_${car.model}_${car.year}.txt`);
-    const content = await reviewsFile.download();
+    let content;
+
+    try {
+        const reviewsFile = getFile(`${REVIEWS_SOURCE}/${car.carMaker}_${car.model}_${car.year}.txt`);
+        content = await reviewsFile.download();
+    } catch {
+        continue;
+    }
 
     const texts: string[] = [];
     const metadatas: object[] = [];
@@ -25,7 +37,7 @@ import { ReviewModel } from "../common/review-model";
         const reviewParagraphs = splitTextIntoParagraphs(review.text);
 
         for(const [index, paragraph] of reviewParagraphs.entries()) {
-          const text = `[${car.carMaker} ${car.model} ${car.year}] ${paragraph}`;
+          const text = `${formatCarDetails(car)}: ${paragraph} ${formatCarDetails(car)}`;
 
           const json = {
             carMaker: car.carMaker,

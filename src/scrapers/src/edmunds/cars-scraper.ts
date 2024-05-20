@@ -78,7 +78,7 @@ async function getYears(carMaker: string, model: string): Promise<string[]> {
       const years = await getYears(carMaker, model);
 
       for (const year of years) {
-        const car = new CarModel(carMaker, model, year);
+        const car = new CarModel(carMaker, model, Number(year));
 
         console.log(car);
 

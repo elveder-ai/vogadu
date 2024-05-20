@@ -1,0 +1,36 @@
+PATCH /collections/<collection-name>
+{
+    "vectors": {
+        "": {
+            "on_disk": true
+        }
+    }
+}
+
+PUT /collections/<collection-name>/index
+{
+    "field_name": "metadata.carMaker",
+    "field_schema": "keyword"
+}
+PUT /collections/<collection-name>/index
+{
+    "field_name": "metadata.model",
+    "field_schema": {
+        "type": "text",
+        "tokenizer": "word",
+        "lowercase": true
+    }
+}
+PUT /collections/<collection-name>/index
+{
+    "field_name": "metadata.year",
+    "field_schema": "integer"
+}
+
+PATCH collections/<collection-name>
+{
+  "hnsw_config": {
+    "m": 16,
+    "ef_construct": 100
+  }
+}
