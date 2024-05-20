@@ -91,6 +91,7 @@ export const callback = onRequest(async (request, response) => {
       await sendPubRequest(MESSENGER_PUB_SUB_TOPIC, pubSubMessage);
     }
   } else if(data.entry[0].messaging[0].postback != undefined) {
+    await sendMessage(senderId, 'Hi there! This is Vogadu, an AI powered bot for answering all your car related questions.');
     await sendInitialMessages(senderId);
     await sendMessage(senderId, 'Now, what\'s on your mind?');
   }
@@ -99,7 +100,6 @@ export const callback = onRequest(async (request, response) => {
 });
 
 async function sendInitialMessages(senderId: string) {
-  await sendMessage(senderId, 'Hi there! This is Vogadu, an AI powered bot for answering all your car related questions.');
   await sendMessage(senderId, 'Just a heads up, while we strive to provide accurate and up-to-date information, there can be mistakes. Please consider consulting a professional for critical issues or decisions.');
   await sendMessage(senderId, 'Also, please send your messages one at a time, so we can provide you the most accurate and detailed response for each of your questions.')
 }
