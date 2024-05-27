@@ -80,20 +80,30 @@ export const callback = onRequest(async (request, response) => {
 
       await sendMessage(senderId, 'We have deleted all the data we have collected from you.');
     } else {
-      const input = data.entry[0].messaging[0].message.text;
-
       if(user == undefined) {
         await sendInitialMessages(senderId);
         await sendTypingOn(senderId);
       }
 
+      const input = data.entry[0].messaging[0].message.text;
       const pubSubMessage = new PubSubMessageModel(senderId, getSessionId(), input);
       await sendPubRequest(MESSENGER_PUB_SUB_TOPIC, pubSubMessage);
     }
   } else if(data.entry[0].messaging[0].postback != undefined) {
-    await sendMessage(senderId, 'Hi there! This is Vogadu, an AI powered bot for answering all your car related questions.');
-    await sendInitialMessages(senderId);
-    await sendMessage(senderId, 'Now, what\'s on your mind?');
+    if(data.entry[0].messaging[0].postback.payload == 'get_started') {
+      await sendMessage(senderId, 'Hi there! This is Vogadu, an AI powered bot for answering all your car related questions.');
+      await sendInitialMessages(senderId);
+      await sendMessage(senderId, 'Now, what\'s on your mind?');
+    } else {
+      if(user == undefined) {
+        await sendInitialMessages(senderId);
+        await sendTypingOn(senderId);
+      }
+      
+      const input = data.entry[0].messaging[0].postback.title;
+      const pubSubMessage = new PubSubMessageModel(senderId, getSessionId(), input);
+      await sendPubRequest(MESSENGER_PUB_SUB_TOPIC, pubSubMessage);
+    }
   }
 
   response.send(true);
