@@ -99,8 +99,8 @@ export const callback = onRequest(async (request, response) => {
         await sendInitialMessages(senderId);
         await sendTypingOn(senderId);
       }
-      
-      const input = data.entry[0].messaging[0].postback.title;
+
+      const input = data.entry[0].messaging[0].postback.payload;
       const pubSubMessage = new PubSubMessageModel(senderId, getSessionId(), input);
       await sendPubRequest(MESSENGER_PUB_SUB_TOPIC, pubSubMessage);
     }
