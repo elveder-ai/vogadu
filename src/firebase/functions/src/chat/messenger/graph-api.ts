@@ -3,7 +3,7 @@ import { sendHttpsRequest } from '../../common/https';
 
 import messengerCredentials = require('../../../../../credentials/messenger.json');
 
-export const MESSAGE_MAX_LENGHT = 2000;
+const MESSAGE_MAX_LENGHT = 2000;
 
 export async function sendMessage(senderId: string, message: string) {
   if(message.length > MESSAGE_MAX_LENGHT) {

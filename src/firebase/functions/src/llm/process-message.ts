@@ -9,7 +9,7 @@ process.env.LANGCHAIN_API_KEY = langsmithCredentials.apiKey;
 process.env.LANGCHAIN_PROJECT = langsmithCredentials.project
 process.env.LANGCHAIN_TRACING_V2 = langsmithCredentials.tracingV2;
 
-export async function processMessage(userId: string, sessionId: string, input: string, responseMaxLength: number): Promise<string> {
+export async function processMessage(userId: string, sessionId: string, input: string): Promise<string> {
   const messages = await getMessagesByUser(userId, sessionId);
   const chatHistory: BaseMessage[] = [];
 
@@ -18,7 +18,7 @@ export async function processMessage(userId: string, sessionId: string, input: s
     chatHistory.push(new AIMessage(message.response));
   }
 
-  const carsAgent = await getCarsAgent(responseMaxLength);
+  const carsAgent = await getCarsAgent();
 
   const result = await carsAgent.invoke({
     input: input,

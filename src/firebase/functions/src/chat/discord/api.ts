@@ -6,7 +6,7 @@ import { OptionsModel, RequestModel } from './models/request-model';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { PubSubMessageModel } from './models/pub-sub-message-model';
 import { REST, Routes } from 'discord.js';
-import { processMessage } from '../../llm/agent';
+import { processMessage } from '../../llm/process-message';
 import { getSubData, sendPubRequest } from '../../common/pub-sub';
 import { PING_REQUEST_HEADER_KEY, PING_REQUEST_HEADER_VALUE } from '../../common/ping';
 
@@ -102,7 +102,7 @@ export const processUserInput = onMessagePublished(DISCORD_PUB_SUB_TOPIC, async 
   logger.log('ProcessUserInput: DATA');
   logger.log(data);
 
-  const carDetails = await processMessage('', '', data.input, DISCORD_MESSAGE_MAX_LENGTH);
+  const carDetails = await processMessage('', '', data.input);
 
   let result = `<@${data.userId}>\n**${data.input}**\n\n${carDetails} `;
 

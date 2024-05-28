@@ -3,18 +3,19 @@ import * as logger from '../../common/logger';
 import { parseGetParameters, parsePostData } from '../../common/request';
 import crypto from 'crypto';
 import { RequestModel } from './models/request-model';
-import { sendMarkSeen, sendMessage, sendTypingOn, MESSAGE_MAX_LENGHT } from './graph-api';
+import { sendMarkSeen, sendMessage, sendTypingOn } from './graph-api';
 import { PING_REQUEST_HEADER_KEY, PING_REQUEST_HEADER_VALUE } from '../../common/ping';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { getSubData, sendPubRequest } from '../../common/pub-sub';
 import { PubSubMessageModel } from './models/pub-sub-message-model';
-import { processMessage } from '../../llm/agent';
+import { processMessage } from '../../llm/process-message';
 import { addUser, getUser, deleteUser } from '../../storage/users';
 import { UserModel } from '../../storage/models/user-model';
 import { addMessage, deleteMessagesByUser } from '../../storage/messages';
 import { MessageModel } from '../../storage/models/message-model';
 
 import messengerCredentials = require('../../../../../credentials/messenger.json');
+import { splitMessage } from '../../llm/split-message';
 
 const MESSENGER_PUB_SUB_TOPIC = 'MESSENGER';
 
@@ -127,9 +128,24 @@ export const processUserInput = onMessagePublished(MESSENGER_PUB_SUB_TOPIC, asyn
   logger.log('ProcessUserInput: DATA');
   logger.log(data);
 
-  const response = await processMessage(data.senderId, data.sessionId, data.input, MESSAGE_MAX_LENGHT);
+  const response = await processMessage(data.senderId, data.sessionId, data.input);
 
-  await sendMessage(data.senderId, response);
+  const messageMaxLength = 1000;
+
+  if(response.length > messageMaxLength) {
+    const parts = Math.ceil((response.length + 1) / messageMaxLength);
+    const splitResponse = await splitMessage(response, parts);
+
+    if(splitResponse != undefined) {
+      for(const responsePart of splitResponse) {
+        await sendMessage(data.senderId, responsePart);
+      }
+    } else {
+      await sendMessage(data.senderId, response);
+    }
+  } else {
+    await sendMessage(data.senderId, response);
+  }
 
   await addMessage(new MessageModel(
     data.senderId,

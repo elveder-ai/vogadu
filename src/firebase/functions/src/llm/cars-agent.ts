@@ -6,7 +6,7 @@ import { getSelfQueryRetriever } from './retriever';
 
 import openAiCredentials = require('../../../../credentials/openai.json');
 
-export async function getCarsAgent(responseMaxLength: number): Promise<AgentExecutor> {
+export async function getCarsAgent(): Promise<AgentExecutor> {
   const chatModel: any = new ChatOpenAI({
   	openAIApiKey: openAiCredentials.apiKey,
   	modelName: 'gpt-4o',
@@ -26,8 +26,6 @@ export async function getCarsAgent(responseMaxLength: number): Promise<AgentExec
       - Incorporate personal touches, such as “many drivers find” or “a few users have noted,” to make the information relatable.
       - If an issue or detail is mentioned by a significant number of reviewers, it can be considered a common or notable trait.
       - If an issue or detail is mentioned infrequently (e.g., by only one out of fifty of reviewers), consider it as a rare occurrence and mention it as such.
-
-    The response length must not be more than ${responseMaxLength} characters.
   `;
 
   const prompt = ChatPromptTemplate.fromMessages([
