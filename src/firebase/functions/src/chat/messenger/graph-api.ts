@@ -83,6 +83,55 @@ export async function sendMarkSeen(senderId: string) {
   }
 }
 
+export async function sendGetStartedMessage(senderId: string) {
+  const options = {
+    hostname: 'graph.facebook.com',
+    path: `/v2.6/me/messages?access_token=${messengerCredentials.pageAccessToken}`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  };
+
+  const data = {
+    'recipient': {
+      'id': senderId
+    },
+    'message': {
+      'attachment': {
+        'type': 'template',
+        'payload': {
+          'template_type': 'button',
+          'text': 'Hi there! This is Vogadu, an AI powered bot that can answer all your questions about cars. How can we help you today?\n\nHere are a few options to help you get started. Feel free to try one of these or ask anything else you want to know about cars! 🚗💬',
+          'buttons': [
+            {
+              'title': 'Choosing my next car',
+              'type': 'postback',
+              'payload': 'I want to buy a car, help me choose the best one for me by asking me three questions.'
+            },
+            {
+              'title': 'Get details about a car',
+              'type': 'postback',
+              'payload': 'I am buying a car and I want to know about possible issues I may have with it.'
+            },
+            {
+              'title': 'What is a fuel pump?',
+              'type': 'postback',
+              'payload': 'What is a fuel pump?'
+            }
+          ]
+        }
+      }
+    }
+  };
+
+  try {
+    await sendHttpsRequest(options, data);
+  } catch (e) {
+    logger.error(['SendGetStartedMessage error: ', e]);
+  }
+}
+
 export async function sendContactConvertionsApiEvent(senderId: string) {
   const options = {
     hostname: 'graph.facebook.com',
