@@ -15,7 +15,6 @@ import { addMessage, deleteMessagesByUser } from '../../storage/messages';
 import { MessageModel } from '../../storage/models/message-model';
 
 import messengerCredentials = require('../../../../../credentials/messenger.json');
-import { splitMessage } from '../../llm/split-message';
 
 const MESSENGER_PUB_SUB_TOPIC = 'MESSENGER';
 
@@ -130,22 +129,7 @@ export const processUserInput = onMessagePublished(MESSENGER_PUB_SUB_TOPIC, asyn
 
   const response = await processMessage(data.senderId, data.sessionId, data.input);
 
-  const messageMaxLength = 1000;
-
-  if(response.length > messageMaxLength) {
-    const parts = Math.ceil((response.length + 1) / messageMaxLength);
-    const splitResponse = await splitMessage(response, parts);
-
-    if(splitResponse != undefined) {
-      for(const responsePart of splitResponse) {
-        await sendMessage(data.senderId, responsePart);
-      }
-    } else {
-      await sendMessage(data.senderId, response);
-    }
-  } else {
-    await sendMessage(data.senderId, response);
-  }
+  await sendMessage(data.senderId, response);
 
   await addMessage(new MessageModel(
     data.senderId,
