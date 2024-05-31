@@ -2,24 +2,28 @@ h1 {
     margin-top: 24px;
     margin-bottom: 8px;
     font-size: 2.8rem;
+    font-weight: 400;
 }
 
 h2 {
     margin-top: 18px;
     margin-bottom: 8px;
     font-size: 2.0rem;
+    font-weight: 400;
 }
 
 h3 {
     margin-top: 12px;
     margin-bottom: 8px;
     font-size: 1.5rem;
+    font-weight: 400;
 }
 
 p {
     margin-bottom: 8px;
     font-size: 1.0rem;
     line-height: 1.3rem;
+    font-weight: 400;
 }
 
 .bold {
@@ -27,7 +31,7 @@ p {
 }
 
 .thin {
-    font-weight: 100;
+    font-weight: 200;
 }
 
 
