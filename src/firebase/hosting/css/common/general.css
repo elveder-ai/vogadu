@@ -1,0 +1,38 @@
+:root {
+   /*Dimentions*/
+   --button-width: 152px;  
+   --button-height: 52px;  
+   --button-left-and-right-padding: 32px;
+  /* Colours */
+  --black: #000000;
+  --white: #ffffff;
+  --primary-color: #011d30;
+  --primary-color-transparency: #011d30d9;
+  --secondary-color: #ccf4fc;
+  --secondary-color-transparency: #ccf4fcd9;
+  /* Global font definition */
+  font-family: 'Mulish', sans-serif;
+  font-weight: 400;
+  color: var(--primary-color);
+}
+
+/* Margins and paddings reset */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+p,
+button,
+label,
+input[type="text"],
+input[type="password"] {
+  margin: 0;
+  padding: 0;
+}

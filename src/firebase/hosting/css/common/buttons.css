@@ -1,0 +1,44 @@
+button {
+    height: var(--button-height);
+    margin-bottom: 16px;
+    padding-inline: var(--button-left-and-right-padding);
+    flex-shrink: 0;
+    border-radius: 16px;
+    border-style: none;
+    font-size: 1.0rem;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+button.fixed-width {
+    width: var(--button-width);
+    padding-inline: 0;
+}
+
+button.primary {
+    font-weight: 700;
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+button:hover.primary {
+    background-color: var(--primary-color-transparency);
+}
+
+button.secondary {
+    background-color: var(--secondary-color);
+    color: var(--black);
+}
+
+button:hover.secondary {
+    background-color: var(--secondary-color-transparency);
+}
+
+/* Phones portrait */
+@media only screen and (max-width: 599px) {
+    button,
+    button.fixed-width {
+        width: 100%;
+        padding-inline: 0;
+    }
+}
