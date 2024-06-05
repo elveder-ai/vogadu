@@ -1,18 +1,16 @@
 import { logStartButtonClickEvent, logReadMoreButtonClickEvent } from '../common/analytics.js';
 
-function animateText(selector, textArray, itemIndex, characterIndex, callback) {  
+function animateText(selector, textArray, itemIndex, characterIndex) {  
   const speed = 80;
 
   if (itemIndex == textArray.length) {
     $(`${selector} .cursor`).hide()
 
-    callback();
-
     return;
   }
 
   if (characterIndex == textArray[itemIndex].text.length) {
-    animateText(selector, textArray, itemIndex + 1, 0, callback);
+    animateText(selector, textArray, itemIndex + 1, 0);
 
     return;
   }
@@ -25,7 +23,7 @@ function animateText(selector, textArray, itemIndex, characterIndex, callback) {
 
   $(`${selector} .cursor`).before(character);
 
-  setTimeout(animateText, speed, selector, textArray, itemIndex, characterIndex + 1, callback);
+  setTimeout(animateText, speed, selector, textArray, itemIndex, characterIndex + 1);
 }
 
 $(window).on('load', function() {
@@ -44,17 +42,7 @@ $(window).on('load', function() {
     }
   ]
 
-  animateText('.hero .animation-container h1', text, 0, 0, function () {
-    const speed = 2000;
-
-    $('.hero h2').fadeIn(speed);
-    $('.hero p').fadeIn(speed);
-    $('.hero .start-button').fadeIn(speed);
-
-    setTimeout(function () {
-      $('.hero .read-more-button').addClass('visible');
-    }, speed / 2);
-  });
+  animateText('.hero .animation-container h1', text, 0, 0);
 });
 
 $('.start-button').click(function () {

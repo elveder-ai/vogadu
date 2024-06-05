@@ -65,27 +65,24 @@
 }
 
 .hero h2 {
-    display: none;
     margin-bottom: 32px;
     text-align: center;
 }
 
 .hero p {
-    display: none;
     text-align: center;
 }
 
 .hero .start-button {
-    display: none;
     margin-top: 32px;
 }
 
 .hero .read-more-button {
-    display: none;
     width: 64px;
     height: 64px;
     position: absolute;
     bottom: 42px;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -93,10 +90,6 @@
     border-radius: 50%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     cursor: pointer;
-}
-
-.hero .read-more-button.visible {
-    display: flex;
 }
 
 .hero .read-more-button img {
@@ -320,19 +313,7 @@
         border-radius: 0 50px 50px 50px;
     }
 
-    .hero h2 {
-        display: block;
-    }
-
-    .hero p {
-        display: block;
-    }
-
-    .hero .start-button {
-        display: block;
-    }
-
-    .hero .read-more-button.visible {
+    .hero .read-more-button {
         display: none;
     }
 }
