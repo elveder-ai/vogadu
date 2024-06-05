@@ -64,10 +64,6 @@
     text-align: center;
 }
 
-.hero h1.mobile {
-    display: none;
-}
-
 .hero h2 {
     display: none;
     margin-bottom: 32px;
@@ -321,14 +317,6 @@
         margin-top: 8px;
         box-sizing: border-box;
         border-radius: 0 50px 50px 50px;
-    }
-
-    .hero .animation-container{
-        display: none;
-    }
-
-    .hero h1.mobile {
-        display: block;
     }
 
     .hero h2 {

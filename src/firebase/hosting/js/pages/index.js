@@ -1,10 +1,6 @@
 import { logStartButtonClickEvent, logReadMoreButtonClickEvent } from '../common/analytics.js';
 
-function animateText(selector, textArray, itemIndex, characterIndex, callback) {
-  if($(selector).is(':hidden')) {
-    return;
-  }
-  
+function animateText(selector, textArray, itemIndex, characterIndex, callback) {  
   const speed = 80;
 
   if (itemIndex == textArray.length) {
