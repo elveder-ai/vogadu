@@ -1,5 +1,4 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js'
-import { getAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-analytics.js'
 
 const firebaseConfig = {
   apiKey: "AIzaSyBp_nKItv6ebJZjUFphUQfhJENlTxJSV-A",
@@ -11,10 +10,4 @@ const firebaseConfig = {
   measurementId: "G-C9MMJYPBND"
 };
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-// Index
-export function logStartButtonClickEvent(buttonId) {
-  logEvent(analytics, 'start_button_click', { buttonId: buttonId });
-}
+export const app = initializeApp(firebaseConfig);

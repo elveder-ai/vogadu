@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<svg height="100" width="100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Vertical line -->
+  <line x1="50" y1="20" x2="50" y2="81" style="stroke:black;stroke-width:4" />
+    <!-- Left diagonal line of the arrow -->
+  <line x1="30" y1="60" x2="50" y2="80" style="stroke:black;stroke-width:4" />
+  <!-- Right diagonal line of the arrow -->
+  <line x1="70" y1="60" x2="50" y2="80" style="stroke:black;stroke-width:4" />
+</svg>
