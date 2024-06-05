@@ -1,6 +1,10 @@
 import { logStartButtonClickEvent, logReadMoreButtonClickEvent } from '../common/analytics.js';
 
 function animateText(selector, textArray, itemIndex, characterIndex, callback) {
+  if($(selector).is(':hidden')) {
+    return;
+  }
+  
   const speed = 80;
 
   if (itemIndex == textArray.length) {
@@ -28,7 +32,7 @@ function animateText(selector, textArray, itemIndex, characterIndex, callback) {
   setTimeout(animateText, speed, selector, textArray, itemIndex, characterIndex + 1, callback);
 }
 
-$(document).ready(function () {
+$(window).on('load', function() {
   const text = [
     {
       text: 'Hi there! This is ',
@@ -52,7 +56,7 @@ $(document).ready(function () {
     $('.hero .start-button').fadeIn(speed);
 
     setTimeout(function () {
-      $('.hero .read-more-button').fadeTo(0, 1);
+      $('.hero .read-more-button').addClass('visible');
     }, speed / 2);
   });
 });

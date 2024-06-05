@@ -8,7 +8,7 @@
     background-image: linear-gradient(146deg, #def5f2, #8fb6af);
 }
 
-.message {
+.hero .message {
     width: 70%;
     display: flex;
     flex-direction: row;
@@ -16,19 +16,19 @@
     align-items: flex-end;
 }
 
-.message img {
+.hero .message img {
     width: 50px;
     height: auto;
 }
 
-.message img.account {
+.hero .message img.account {
     border-radius: 50%;
     border-style: solid;
     border-width: 1px;
     border-color: #a7d9df;
 }
 
-.message .inner {
+.hero .message .inner {
     width: 100%;
     padding: 32px 42px;
     background-color: var(--white);
@@ -64,6 +64,10 @@
     text-align: center;
 }
 
+.hero h1.mobile {
+    display: none;
+}
+
 .hero h2 {
     display: none;
     margin-bottom: 32px;
@@ -81,12 +85,11 @@
 }
 
 .hero .read-more-button {
-    opacity: 0;
+    display: none;
     width: 64px;
     height: 64px;
     position: absolute;
     bottom: 42px;
-    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -94,6 +97,10 @@
     border-radius: 50%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     cursor: pointer;
+}
+
+.hero .read-more-button.visible {
+    display: flex;
 }
 
 .hero .read-more-button img {
@@ -121,7 +128,7 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 32px
+    gap: 32px;
 }
 
 .features .feature:nth-child(odd) {
@@ -175,7 +182,6 @@
     align-items: center;
 }
 
-
 .how img {
     width: 150px;
     height: auto;
@@ -226,4 +232,118 @@
 
 .about .start-button {
     margin-top: 12px;
+}
+
+/* Tablet Landscape */
+@media only screen and (max-width: 1024px) {
+    .hero .message {
+        width: 90%;
+    }
+
+    .hero .read-more-button {
+        bottom: 16px;
+    }
+}
+
+
+/* Tablet Portrait */
+@media only screen and (max-width: 767px) {
+    .features {
+        width: 100%;
+        padding-inline: 16px;
+        box-sizing: border-box;
+    }
+
+    .features h2 {
+        text-align: center;
+    }
+
+    .features .feature {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+    }
+
+    .features .feature:nth-child(odd) {
+        flex-direction: column;
+    }
+
+    .features h3,
+    .features p {
+        text-align: center;
+    }
+
+    .how {
+        width: 100%;
+        padding-inline: 16px;
+        box-sizing: border-box;
+    }
+
+    .how .steps {
+        flex-direction: column;
+    }
+
+    .how .step {
+        width: 100%;
+        margin-bottom: 22px;
+    }
+
+    .how .step:last-child {
+        margin-bottom: 0;
+    }
+
+    .about {
+        padding-inline: 16px;
+        box-sizing: border-box;
+    }
+}
+
+/* Phones Portrait */
+@media screen and (max-width: 599px) {
+    .hero {
+        height: unset;
+        padding: 22px 16px;
+    }
+
+    .hero .message {
+        width: 100%;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+
+    .hero .message img.background {
+        display: none;
+    }
+
+    .hero .message .inner {
+        margin-top: 8px;
+        box-sizing: border-box;
+        border-radius: 0 50px 50px 50px;
+    }
+
+    .hero .animation-container{
+        display: none;
+    }
+
+    .hero h1.mobile {
+        display: block;
+    }
+
+    .hero h2 {
+        display: block;
+    }
+
+    .hero p {
+        display: block;
+    }
+
+    .hero .start-button {
+        display: block;
+    }
+
+    .hero .read-more-button.visible {
+        display: none;
+    }
 }
