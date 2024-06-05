@@ -315,6 +315,7 @@
 
     .hero .message .inner {
         margin-top: 8px;
+        padding: 16px 16px;
         box-sizing: border-box;
         border-radius: 0 50px 50px 50px;
     }
