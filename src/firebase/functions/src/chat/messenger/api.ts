@@ -3,16 +3,17 @@ import * as logger from '../../common/logger';
 import { parseGetParameters, parsePostData } from '../../common/request';
 import crypto from 'crypto';
 import { RequestModel } from './models/request-model';
-import { sendGetStartedMessage, sendMarkSeen, sendMessage, sendTypingOn } from './graph-api';
+import { sendGetStartedMessage, sendHumanMessage, sendMarkSeen, sendMessage, sendTypingOn } from './graph-api';
 import { PING_REQUEST_HEADER_KEY, PING_REQUEST_HEADER_VALUE } from '../../common/ping';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { getSubData, sendPubRequest } from '../../common/pub-sub';
 import { PubSubMessageModel } from './models/pub-sub-message-model';
 import { processMessage } from '../../llm/process-message';
-import { addUser, getUser, deleteUser } from '../../storage/users';
+import { addUser, getUser, deleteUser, setHumanInteraction } from '../../storage/users';
 import { UserModel } from '../../storage/models/user-model';
 import { addMessage, deleteMessagesByUser } from '../../storage/messages';
 import { MessageModel } from '../../storage/models/message-model';
+import { SupportMessage } from './models/support-message';
 
 import messengerCredentials = require('../../../../../credentials/messenger.json');
 
@@ -62,9 +63,6 @@ export const callback = onRequest(async (request, response) => {
   
   const senderId = data.entry[0].messaging[0].sender.id;
 
-  await sendMarkSeen(senderId);
-  await sendTypingOn(senderId);
-
   const user = await getUser(senderId);
 
   if(user == undefined) {
@@ -78,6 +76,9 @@ export const callback = onRequest(async (request, response) => {
     response.send(true);
     return;
   }
+
+  await sendMarkSeen(senderId);
+  await sendTypingOn(senderId);
 
   if(data.entry[0].messaging[0].message != undefined) {
     if(data.entry[0].messaging[0].message.commands != undefined) {
@@ -151,6 +152,17 @@ export const processUserInput = onMessagePublished(MESSENGER_PUB_SUB_TOPIC, asyn
   ));
 
   return;
+});
+
+export const supportMessage = onRequest(async (request, response) => {
+  const data: SupportMessage = parsePostData(request);
+  logger.log(JSON.stringify(data));
+
+  await setHumanInteraction(data.senderId);
+
+  await sendHumanMessage(data.senderId, messengerCredentials.supportPersonaId, data.message);
+
+  response.send(true);
 });
 
 function verifyRequestSignature(request: Request): boolean {

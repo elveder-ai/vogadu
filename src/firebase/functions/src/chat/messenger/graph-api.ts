@@ -132,6 +132,33 @@ export async function sendGetStartedMessage(senderId: string) {
   }
 }
 
+export async function sendHumanMessage(senderId: string, personaId: string, message: string) {
+  const options = {
+    hostname: 'graph.facebook.com',
+    path: `/v2.6/me/messages?access_token=${messengerCredentials.pageAccessToken}`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  };
+
+  const data = {
+    'recipient': {
+      'id': senderId
+    },
+    'persona_id': personaId,
+    'message': {
+      'text': message
+    }
+  };
+
+  try {
+    await sendHttpsRequest(options, data);
+  } catch (e) {
+    logger.error(['SendMessage error: ', e]);
+  }
+}
+
 export async function sendContactConvertionsApiEvent(senderId: string) {
   const options = {
     hostname: 'graph.facebook.com',

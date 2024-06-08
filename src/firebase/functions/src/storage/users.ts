@@ -23,3 +23,9 @@ export async function getUser(userId: string): Promise<UserModel | undefined> {
 export async function deleteUser(userId: string) {
   await db.collection(USERS_COLLECTION).doc(userId).delete();
 }
+
+export async function setHumanInteraction(userId: string) {
+  const userRef = db.collection(USERS_COLLECTION).doc(userId);
+
+  await userRef.update({ humanInteraction: true });
+}
