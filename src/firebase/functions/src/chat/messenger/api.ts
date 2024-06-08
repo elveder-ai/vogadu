@@ -69,8 +69,14 @@ export const callback = onRequest(async (request, response) => {
 
   if(user == undefined) {
     await addUser(new UserModel(
-      senderId
+      senderId,
+      false
     ));
+  } else if(user.humanInteraction == true) {
+    logger.log('HUMAN_INTERACTION');
+
+    response.send(true);
+    return;
   }
 
   if(data.entry[0].messaging[0].message != undefined) {
