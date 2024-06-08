@@ -155,7 +155,7 @@ export async function sendHumanMessage(senderId: string, personaId: string, mess
   try {
     await sendHttpsRequest(options, data);
   } catch (e) {
-    logger.error(['SendMessage error: ', e]);
+    logger.error(['SendHumanMessage error: ', e]);
   }
 }
 
