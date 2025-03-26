@@ -1,0 +1,204 @@
+{
+	"info": {
+		"_postman_id": "1d543ae5-336e-4a1f-be88-b9bd97a082fa",
+		"name": "Vogadu",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18750518"
+	},
+	"item": [
+		{
+			"name": "Discord",
+			"item": [
+				{
+					"name": "Add command",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bot <DISCORD_BOT_TOKEN>",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"car\",\n    \"type\": 1,\n    \"description\": \"Enter details about the car.\",\n    \"options\": [\n        {\n            \"name\": \"details\",\n            \"description\": \"Provide the car maker, the model and the year\",\n            \"type\": 3,\n            \"required\": true\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://discord.com/api/v10/applications/<DISCORD_APPLICATION_ID>/commands",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v10",
+								"applications",
+								"<DISCORD_APPLICATION_ID>",
+								"commands"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Messenger",
+			"item": [
+				{
+					"name": "Set greeting text",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"greeting\": [\n        {\n            \"locale\": \"default\",\n            \"text\": \"Hello, {{user_first_name}}! This is Vogadu, an AI powered bot that can answer all you questions about cars. Ready to get started?\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=<FACEBOOK_ACCESS_TOKEN>",
+							"protocol": "https",
+							"host": [
+								"graph",
+								"facebook",
+								"com"
+							],
+							"path": [
+								"v2.6",
+								"me",
+								"messenger_profile"
+							],
+							"query": [
+								{
+									"key": "access_token",
+									"value": "<FACEBOOK_ACCESS_TOKEN>"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Get started button",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"get_started\": {\n        \"payload\": \"true\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=<FACEBOOK_ACCESS_TOKEN>",
+							"protocol": "https",
+							"host": [
+								"graph",
+								"facebook",
+								"com"
+							],
+							"path": [
+								"v2.6",
+								"me",
+								"messenger_profile"
+							],
+							"query": [
+								{
+									"key": "access_token",
+									"value": "<FACEBOOK_ACCESS_TOKEN>"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Commands",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"commands\": [\n        {\n            \"locale\": \"default\",\n            \"commands\": [\n                {\n                    \"name\": \"delete\",\n                    \"description\": \"Delete the data we have collected from you\"\n                }\n            ]\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://graph.facebook.com/v19.0/me/messenger_profile?access_token=<FACEBOOK_ACCESS_TOKEN>",
+							"protocol": "https",
+							"host": [
+								"graph",
+								"facebook",
+								"com"
+							],
+							"path": [
+								"v19.0",
+								"me",
+								"messenger_profile"
+							],
+							"query": [
+								{
+									"key": "access_token",
+									"value": "<FACEBOOK_ACCESS_TOKEN>"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Support Persona",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://graph.facebook.com/281498301707624/personas?name=Support&profile_picture_url=https://z-p3-scontent.fpdv1-1.fna.fbcdn.net/v/t45.1600-4/438077561_368280599603148_6402265976441737042_n.png?_nc_cat=108%26ccb=1-7%26_nc_sid=fa59f1%26_nc_ohc=dLGJZmuI6bYQ7kNvgEVvoVS%26_nc_ht=z-p3-scontent.fpdv1-1.fna%26oh=00_AYAZHFKiiR5UyagQY6B-LUxaB0IANqTC_UQ0nmK4vUwCtw%26oe=6669F6C4&access_token=<FACEBOOK_ACCESS_TOKEN>",
+							"protocol": "https",
+							"host": [
+								"graph",
+								"facebook",
+								"com"
+							],
+							"path": [
+								"281498301707624",
+								"personas"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Support"
+								},
+								{
+									"key": "profile_picture_url",
+									"value": "https://z-p3-scontent.fpdv1-1.fna.fbcdn.net/v/t45.1600-4/438077561_368280599603148_6402265976441737042_n.png?_nc_cat=108&ccb=1-7&_nc_sid=fa59f1&_nc_ohc=dLGJZmuI6bYQ7kNvgEVvoVS&_nc_ht=z-p3-scontent.fpdv1-1.fna&oh=00_AYAZHFKiiR5UyagQY6B-LUxaB0IANqTC_UQ0nmK4vUwCtw&oe=6669F6C4"
+								},
+								{
+									"key": "access_token",
+									"value": "<FACEBOOK_ACCESS_TOKEN>"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
